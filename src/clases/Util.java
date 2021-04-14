@@ -136,5 +136,7 @@ public class Util {
     
     public static void setAnchoColumna(TableColumn columna, int ancho){
         columna.setPreferredWidth(ancho);
+//        columna.setMaxWidth(ancho);
+//        columna.setMinWidth(ancho);
     }
 }

@@ -88,6 +88,7 @@ public class Reporte_venta_diaria extends javax.swing.JDialog {
         model = new DefaultTableModel();
         jTable_venta = new JTable(model);
         jScrollPane1.setViewportView(jTable_venta);
+        jTable_venta.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         String[] nombre_column = new String[10];
         nombre_column[0] = "TE";
@@ -118,16 +119,16 @@ public class Reporte_venta_diaria extends javax.swing.JDialog {
         Filtrar();
         
         int[] ancho = new int[10];
-        ancho[0] = 30;
-        ancho[1] = 10;
-        ancho[2] = 40;
-        ancho[3] = 30;
-        ancho[4] = 70;
-        ancho[5] = 80;
-        ancho[6] = 20;
-        ancho[7] = 20;
-        ancho[8] = 20;
-        ancho[9] = 30;
+        ancho[0] = 100;//TE
+        ancho[1] = 60;//EMISION
+        ancho[2] = 100;//EJECUCION
+        ancho[3] = 70;//PAX
+        ancho[4] = 150;//NOMBRE
+        ancho[5] = 200;//EXCURSION
+        ancho[6] = 70;//TOTAL
+        ancho[7] = 70;//EFECTIVO
+        ancho[8] = 70;//CREDITO
+        ancho[9] = 90;//PROVEEDOR
         
         for (int i = 0; i < nombre_column.length; i++) {
             TableColumn columna = jTable_venta.getColumn(nombre_column[i]);
