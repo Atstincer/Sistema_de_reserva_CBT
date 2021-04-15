@@ -6,7 +6,7 @@
 package interfaces;
 
 import clases.Conexion;
-import clases.ExcelExporter;
+import clases.Util;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -270,7 +270,7 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
                 jTable_serviciosRegreso = new JTable(model_regreso);
 
                 try {
-                    ExcelExporter excel_exporter = new ExcelExporter();
+                    Util excel_exporter = new Util();
                     excel_exporter.exportToEXEL(jTable_serviciosIda, jTable_serviciosRegreso, file, "Ida", "Regreso",
                             encabezadoTablaIda, encabezadoTablaRegreso, "Salida " + ida_hora + " desde " + ida_origen, ""
                             + "Regreso " + regreso_hora + " desde " + regreso_origen);

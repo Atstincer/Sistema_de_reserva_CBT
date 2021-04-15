@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import jxl.Workbook;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
@@ -28,7 +29,7 @@ import jxl.write.WriteException;
  *
  * @author JAVIER
  */
-public class ExcelExporter {
+public class Util {
 
     public static boolean exportToEXEL(JTable table_uno, JTable table_dos, File file, String nombreTab_uno,
             String nombreTab_dos, String encabezado_uno, String encabezado_dos, String footer_uno,
@@ -105,6 +106,31 @@ public class ExcelExporter {
             ex.printStackTrace();
         }
         return false;
+    }
+    
+    public static boolean EsInt(String a) {
+        try {
+            int b = Integer.parseInt(a);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+     
+    public static boolean IsEmpty(String a){
+        if(a.equals("") || a.equals(null)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    public static void VaciarTabla(DefaultTableModel model) {
+        if(model.getRowCount() > 0){
+            for (int i = model.getRowCount() - 1; i >= 0; i--) {
+                model.removeRow(i);
+            }
+        }
     }
 
 }

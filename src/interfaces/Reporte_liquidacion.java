@@ -6,7 +6,7 @@
 package interfaces;
 
 import clases.Conexion;
-import clases.ExcelExporter;
+import clases.Util;
 import clases.FormatoTabla;
 import java.awt.Color;
 import java.awt.Image;
@@ -27,7 +27,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -109,154 +108,6 @@ public class Reporte_liquidacion extends javax.swing.JFrame {
         model.addColumn("TOTAL");
 
         Filtrar();
-
-//        try {
-//            Connection cn = Conexion.conectar();
-//            PreparedStatement pst = cn.prepareStatement("select Descripcion, TE_alojamiento, Pax, Menores, Infantes, "
-//                    + "TE_traslado, Efectivo_hotel, Efectivo_trf, Tarjeta_credito, Credito_hotel, Credito_trf, Hotel, Destino "
-//                    + "from servicios where Reservado_por = '" + Login.user + "' and Reservado_fecha = '" + fecha + "'");
-//
-//            ResultSet rs = pst.executeQuery();
-//
-//            double importe_total_efectivo = 0, importe_total_credito = 0, importe_total_gral = 0;
-//
-//            while (rs.next()) {
-//                Object[] fila_rs = new Object[8];
-//                Object[] fila_aloj = new Object[7];
-//                Object[] fila_trf = new Object[7];
-//                int adulto = 0, menor = 0, infante = 0;
-//                String hotel = "", destino = "";
-//                double importe_total_TEaloj = 0, importe_total_TEtrf = 0;
-//
-//                for (int i = 0; i < 13; i++) {//llenando vector fila_rs con resultados del ResultSet
-//                    if (i >= 0 && i < 2) {//descripcion y TE alojamiento
-//                        fila_rs[i] = rs.getString(i + 1);
-////                        System.out.print("i- " + i + " " + fila_rs[i] + "\n");
-//                    }
-//                    if (i == 2) {
-//                        String ad_string = rs.getString(i + 1);
-//                        if (!ad_string.equals("")) {
-//                            adulto += Integer.parseInt(ad_string);
-////                            System.out.print("i- " + i + " " + adulto + "\n");
-//                        } else {
-////                             System.out.print("i- " + i + "\n");
-//                        }
-//
-//                    }
-//                    if (i == 3) {
-//                        String men_string = rs.getString(i + 1);
-//                        if (!men_string.equals("")) {
-//                            menor += Integer.parseInt(men_string);
-////                            System.out.print("i- " + i + " " + menor + "\n");
-//                        } else {
-////                            System.out.print("i- " + i + "\n");
-//                        }
-//
-//                    }
-//                    if (i == 4) {
-//                        String inf_string = rs.getString(i + 1);
-//                        if (!inf_string.equals("")) {
-//                            infante += Integer.parseInt(inf_string);
-////                            System.out.print("i- " + i + " " + infante + "\n");
-//                        } else {
-////                            System.out.print("i- " + i + "\n");
-//                        }
-//                    }
-//                    if (i == 6) {//alojamiento efectivo      
-//                        fila_rs[i - 3] = rs.getDouble(i + 1);
-//                        importe_total_TEaloj += (double) fila_rs[i - 3];
-////                        System.out.print("i- " + i + " " + fila_rs[i-3] + " acumulado- " + importe_total_TEaloj + "\n");
-//                        importe_total_efectivo += (double) fila_rs[i - 3];
-//                    }
-//                    if (i == 9) {//alojamiento crédito       
-//                        fila_rs[i - 3] = rs.getDouble(i + 1);
-//                        importe_total_TEaloj += (double) fila_rs[i - 3];
-////                        System.out.print("i- " + i + " " + fila_rs[i-3] + " acumulado- " + importe_total_TEaloj + "\n");
-//                        importe_total_credito += (double) fila_rs[i - 3];
-//                    }
-//                    if (i == 7) {//trf efectivo      
-//                        fila_rs[i - 3] = rs.getDouble(i + 1);
-//                        importe_total_TEtrf += (double) fila_rs[i - 3];
-////                        System.out.print("i- " + i + " " + fila_rs[i-3] + " acumulado- " + importe_total_TEtrf + "\n");
-//                        importe_total_efectivo += (double) fila_rs[i - 3];
-//                    }
-//                    if (i == 10) {//trf crédito        
-//                        fila_rs[i - 3] = rs.getDouble(i + 1);
-//                        importe_total_TEtrf += (double) fila_rs[i - 3];
-////                        System.out.print("i- " + i + " " + fila_rs[i-3] + " acumulado- " + importe_total_TEtrf + "\n");
-//                        importe_total_credito += (double) fila_rs[i - 3];
-//                    }
-//                    if (i == 5 || i == 8) {//TE trf y tarjeta de crédito
-//                        fila_rs[i - 3] = rs.getString(i + 1);
-////                        System.out.print("i- " + i + " " + fila_rs[i-3] + "\n");
-//                        if (i == 8) {
-//                            if (fila_rs[i - 3] == null) {
-//                                fila_rs[i - 3] = "";
-//                            }
-//                        }
-//                    }
-//                    if (i == 11) {
-//                        hotel = " " + rs.getString(i + 1);
-//                    }
-//                    if (i == 12) {
-//                        destino = rs.getString(i + 1);
-//                        if (destino.equals("Otros")) {
-//                            destino = "";
-//                        }
-//                    }
-//                }
-//
-////                for (int i = 0; i < fila_rs.length; i++) {
-////                    System.out.print("(" + fila_rs[i] + ")");
-////                }
-////                System.out.println("");
-//                
-//                if (!fila_rs[1].equals("") || fila_rs[1] != null) {//llenendo fila_aloj si TE_aloj diferente de ""
-//                    fila_aloj[0] = fila_rs[1];
-//                    fila_aloj[1] = fila_rs[0] + hotel;
-//                    fila_aloj[2] = adulto + "+" + menor + "+" + infante;
-//                    fila_aloj[3] = fila_rs[3];
-//                    if ((double) fila_rs[6] == 0.0) {
-//                        fila_aloj[4] = "";
-//                    } else {
-//                        fila_aloj[4] = fila_rs[5];
-//                    }
-//                    fila_aloj[5] = fila_rs[6];
-//                    fila_aloj[6] = importe_total_TEaloj;
-//                    mode1.addRow(fila_aloj);
-//                    importe_total_gral += importe_total_TEaloj;
-//                }
-//
-//                if (!fila_rs[2].equals("") || fila_rs[2] != null) {//llenendo fila_trf si TE_trf diferente de ""
-//                    fila_trf[0] = fila_rs[2];
-//                    fila_trf[1] = "TRF a " + destino;
-//                    fila_trf[2] = adulto + "+" + menor + "+" + infante;
-//                    fila_trf[3] = fila_rs[4];
-//                    if ((double) fila_rs[7] == 0.0) {
-//                        fila_trf[4] = "";
-//                    } else {
-//                        fila_trf[4] = fila_rs[5];
-//                    }
-//                    fila_trf[5] = fila_rs[7];
-//                    fila_trf[6] = importe_total_TEtrf;
-//                    mode1.addRow(fila_trf);
-//                    importe_total_gral += importe_total_TEtrf;
-//                }
-//
-//            }
-//            Object[] fila = new Object[7];
-//            fila[0] = "TOTAL";
-//            fila[3] = importe_total_efectivo;
-//            fila[5] = importe_total_credito;
-//            fila[6] = importe_total_gral;
-//            mode1.addRow(fila);
-//
-//            cn.close();
-//
-//        } catch (SQLException e) {
-//            System.err.println("Error al llenar tabla. " + e);
-//            JOptionPane.showMessageDialog(null, "!!Error al mostrar tabla...contacte al administrador");
-//        }
         
         TableColumn columnaTE = jTable_venta.getColumn("TE");
         columnaTE.setMaxWidth(90);
@@ -272,24 +123,10 @@ public class Reporte_liquidacion extends javax.swing.JFrame {
         columnaCredito.setMinWidth(70);
         TableColumn columnaTotal = jTable_venta.getColumn("TOTAL");
         columnaTotal.setMaxWidth(70);
-        columnaTotal.setMinWidth(70);        
-        
-//        DefaultTableCellRenderer render = new DefaultTableCellRenderer();
-//        render.setHorizontalTextPosition(render.RIGHT);
-//        jTable_venta.getColumnModel().getColumn(1).setCellRenderer(render);
-//        jTable_venta.getColumnModel().getColumn(5).setCellRenderer(render);
-//        jTable_venta.getColumnModel().getColumn(6).setCellRenderer(render);
+        columnaTotal.setMinWidth(70);                
 
         TableRowSorter<TableModel> elQueOrdena = new TableRowSorter<TableModel>(model);
         jTable_venta.setRowSorter(elQueOrdena);
-
-       //Nueva instancia de la clase que contiene el formato NO QUIERE FUNCIONAR
-        FormatoTabla formatoTabla = new FormatoTabla();
-        
-//        //Se obtiene la tabla y se establece el formato para cada tipo de dato
-//        jTable_venta.setDefaultRenderer(Double.class, formatoTabla); 
-//        jTable_venta.setDefaultRenderer(String.class, formatoTabla); 
-//        jTable_venta.setDefaultRenderer(Integer.class, formatoTabla);
 
         Color myColorFondo = new Color(204,204,204);
         Color myColorFuente = new Color(0,0,115);
@@ -448,7 +285,7 @@ public class Reporte_liquidacion extends javax.swing.JFrame {
 //                jTable_venta = new JTable(model);               
 
                 try {
-                    ExcelExporter excel_exporter = new ExcelExporter();
+                    Util excel_exporter = new Util();
                     excel_exporter.exportToEXEL(jTable_venta, null, file, nombreTab_uno, "", encabezado_uno, "", footer_uno, "");
 //                    System.out.println("Filas tabla en boton Excel: " + model.getRowCount());
 //                    System.out.println("Columnas tabla en boton Excel: " + model.getColumnCount());
