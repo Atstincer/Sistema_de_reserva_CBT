@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import jxl.Workbook;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
@@ -132,5 +133,8 @@ public class Util {
             }
         }
     }
-
+    
+    public static void setAnchoColumna(TableColumn columna, int ancho){
+        columna.setPreferredWidth(ancho);
+    }
 }

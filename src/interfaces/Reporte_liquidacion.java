@@ -7,7 +7,6 @@ package interfaces;
 
 import clases.Conexion;
 import clases.Util;
-import clases.FormatoTabla;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -71,13 +70,7 @@ public class Reporte_liquidacion extends javax.swing.JFrame {
         
         Color colorJDateFondo = new Color(204,204,204);        
         ((JTextField)jDateChooser.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
-          
         
-//        Date date = jDateChooser.getDate();
-//        String fechaJDate = formato.format(date);
-//        System.out.println("Fecha recuperada del JDate: " + fechaJDate);
-       
-
         try {//recuperando nombre y apellido de usuario/vendedor
             Connection cn = Conexion.conectar();
             PreparedStatement pst = cn.prepareStatement("select Nombre, Apellido from usuarios where Usuario = '"

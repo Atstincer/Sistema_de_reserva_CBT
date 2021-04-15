@@ -67,6 +67,7 @@ public class Admin extends javax.swing.JFrame {
         jMenuItem_paraTransportistas = new javax.swing.JMenuItem();
         jMenuItem_origen_hora_trf = new javax.swing.JMenuItem();
         jMenuItem_liquidacion = new javax.swing.JMenuItem();
+        jMenuItem_reporte_Venta = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem_hotel_sin_confirmar = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
@@ -166,6 +167,14 @@ public class Admin extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem_liquidacion);
 
+        jMenuItem_reporte_Venta.setText("Reporte de Venta");
+        jMenuItem_reporte_Venta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_reporte_VentaActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem_reporte_Venta);
+
         jMenu4.setText("Pendiente");
 
         jMenuItem_hotel_sin_confirmar.setText("Reserva HOTEL sin confirmar");
@@ -226,31 +235,8 @@ public class Admin extends javax.swing.JFrame {
 
     private void jMenuItem_clientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_clientesActionPerformed
         // TODO add your handling code here:
-
         Clientes_tablaFiltro clientes = new Clientes_tablaFiltro();
         clientes.setVisible(true);
-
-        /*
-        Clientes_Admin clientes = new Clientes_Admin();
-        
-        int width = jDesktopPane1.getWidth();
-        int height = jDesktopPane1.getHeight();
-        clientes.setSize(width, height);
-        
-        jDesktopPane1.add(clientes);
-        
-        /*
-        clientes.toFront();
-        clientes.setLocation(jDesktopPane1.getWidth() / 2 - clientes.getWidth() / 2,jDesktopPane1.getWidth() / 2 - clientes.getWidth() / 2);
-        jDesktopPane1.add(clientes);*/
- /*
-        try {
-            clientes.setMaximum(true);
-        } catch (PropertyVetoException e) {
-            System.out.println("Error en maximizar internalframe" + e);
-        }*/
-//        clientes.setVisible(true);
-
     }//GEN-LAST:event_jMenuItem_clientesActionPerformed
 
     private void jMenuItem_reservarServActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_reservarServActionPerformed
@@ -455,6 +441,12 @@ public class Admin extends javax.swing.JFrame {
         pendiente.setVisible(true);
     }//GEN-LAST:event_jMenuItem_hotel_sin_confirmarActionPerformed
 
+    private void jMenuItem_reporte_VentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_reporte_VentaActionPerformed
+        // TODO add your handling code here:
+        Reporte_venta_diaria reporte = new Reporte_venta_diaria(this, true);
+        reporte.setVisible(true);
+    }//GEN-LAST:event_jMenuItem_reporte_VentaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -510,6 +502,7 @@ public class Admin extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem_liquidacion;
     private javax.swing.JMenuItem jMenuItem_origen_hora_trf;
     private javax.swing.JMenuItem jMenuItem_paraTransportistas;
+    private javax.swing.JMenuItem jMenuItem_reporte_Venta;
     private javax.swing.JMenuItem jMenuItem_reservarServ;
     private javax.swing.JMenuItem jMenuItem_salir;
     private javax.swing.JMenuItem jMenuItem_usuarios;
