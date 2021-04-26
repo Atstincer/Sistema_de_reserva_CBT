@@ -8,6 +8,8 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -117,6 +119,16 @@ public class Util {
         }
         return true;
     }
+    
+    //comprobando si es número
+    public static boolean EsDouble(String str) {
+        try {
+            double db = Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
      
     public static boolean IsEmpty(String a){
         if(a.equals("") || a.equals(null)){
@@ -139,4 +151,27 @@ public class Util {
 //        columna.setMaxWidth(ancho);
 //        columna.setMinWidth(ancho);
     }
+    
+    public static String getFecha_actual(){
+        LocalDate fecha = LocalDate.now();
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return fecha.format(formato);
+    }
+    
+//    public static void crearWord(){
+//        XWPFDocument document = new XWPFDocument();
+//        
+//        try {
+//            FileOutputStream output = new FileOutputStream("Documento de prueba.docx");
+//            
+//            XWPFParagraph parrafo = document.createParagraph();
+//            XWPFRun run = parrafo.createRun();
+//            run.setText("Esto es solo probando");
+//            
+//            document.write(output);
+//            output.close();
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, e.getMessage().toString());
+//        }        
+//    }        
 }

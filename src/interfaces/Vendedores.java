@@ -16,7 +16,6 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -72,6 +71,9 @@ public class Vendedores extends javax.swing.JFrame {
         jMenuItem_paraTransportistas = new javax.swing.JMenuItem();
         jMenuItem_origen_hora_trf = new javax.swing.JMenuItem();
         jMenuItem_liquidacion = new javax.swing.JMenuItem();
+        jMenuItem_reporte_venta_diario = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem_hotel_sin_confirmar = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem_Venta_mes_actual = new javax.swing.JMenuItem();
         jMenuItem_Venta_Anio_hasta_actualidad = new javax.swing.JMenuItem();
@@ -167,6 +169,26 @@ public class Vendedores extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem_liquidacion);
 
+        jMenuItem_reporte_venta_diario.setText("Reporte de Venta");
+        jMenuItem_reporte_venta_diario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_reporte_venta_diarioActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem_reporte_venta_diario);
+
+        jMenu4.setText("Pendiente");
+
+        jMenuItem_hotel_sin_confirmar.setText("Reserva HOTEL sin confirmar");
+        jMenuItem_hotel_sin_confirmar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_hotel_sin_confirmarActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem_hotel_sin_confirmar);
+
+        jMenu1.add(jMenu4);
+
         jMenu2.setText("Estadísticas VENTA");
 
         jMenuItem_Venta_mes_actual.setText("En lo que va de mes");
@@ -215,31 +237,8 @@ public class Vendedores extends javax.swing.JFrame {
 
     private void jMenuItem_clientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_clientesActionPerformed
         // TODO add your handling code here:
-
         Clientes_tablaFiltro clientes = new Clientes_tablaFiltro();
         clientes.setVisible(true);
-
-        /*
-        Clientes_Admin clientes = new Clientes_Admin();
-        
-        int width = jDesktopPane1.getWidth();
-        int height = jDesktopPane1.getHeight();
-        clientes.setSize(width, height);
-        
-        jDesktopPane1.add(clientes);
-        
-        /*
-        clientes.toFront();
-        clientes.setLocation(jDesktopPane1.getWidth() / 2 - clientes.getWidth() / 2,jDesktopPane1.getWidth() / 2 - clientes.getWidth() / 2);
-        jDesktopPane1.add(clientes);*/
- /*
-        try {
-            clientes.setMaximum(true);
-        } catch (PropertyVetoException e) {
-            System.out.println("Error en maximizar internalframe" + e);
-        }*/
-//        clientes.setVisible(true);
-
     }//GEN-LAST:event_jMenuItem_clientesActionPerformed
 
     private void jMenuItem_reservarServActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_reservarServActionPerformed
@@ -437,6 +436,18 @@ public class Vendedores extends javax.swing.JFrame {
         cc.setVisible(true);
     }//GEN-LAST:event_jMenuItem_cambiar_contrasenaActionPerformed
 
+    private void jMenuItem_reporte_venta_diarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_reporte_venta_diarioActionPerformed
+        // TODO add your handling code here:
+        Reporte_venta_diaria reporte = new Reporte_venta_diaria(this, true);
+        reporte.setVisible(true);
+    }//GEN-LAST:event_jMenuItem_reporte_venta_diarioActionPerformed
+
+    private void jMenuItem_hotel_sin_confirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_hotel_sin_confirmarActionPerformed
+        // TODO add your handling code here:
+        Hotel_sin_confirmar pendiente = new Hotel_sin_confirmar();
+        pendiente.setVisible(true);
+    }//GEN-LAST:event_jMenuItem_hotel_sin_confirmarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -485,6 +496,7 @@ public class Vendedores extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem_Venta_Anio_hasta_actualidad;
     private javax.swing.JMenuItem jMenuItem_Venta_mes_actual;
@@ -492,9 +504,11 @@ public class Vendedores extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem_cambiar_contrasena;
     private javax.swing.JMenuItem jMenuItem_clientes;
     private javax.swing.JMenuItem jMenuItem_filtroServ;
+    private javax.swing.JMenuItem jMenuItem_hotel_sin_confirmar;
     private javax.swing.JMenuItem jMenuItem_liquidacion;
     private javax.swing.JMenuItem jMenuItem_origen_hora_trf;
     private javax.swing.JMenuItem jMenuItem_paraTransportistas;
+    private javax.swing.JMenuItem jMenuItem_reporte_venta_diario;
     private javax.swing.JMenuItem jMenuItem_reservarServ;
     private javax.swing.JMenuItem jMenuItem_salir;
     private javax.swing.JMenu jMenu_opciones;

@@ -241,8 +241,8 @@ public class Admin extends javax.swing.JFrame {
 
     private void jMenuItem_reservarServActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_reservarServActionPerformed
         // TODO add your handling code here:
-        Servicios_reservar servicios_reservar = new Servicios_reservar();
-        servicios_reservar.setVisible(true);
+        Servicios_reservar reservar = new Servicios_reservar();
+        reservar.setVisible(true);
     }//GEN-LAST:event_jMenuItem_reservarServActionPerformed
 
     private void jMenuItem_filtroServActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_filtroServActionPerformed

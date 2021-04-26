@@ -5,21 +5,24 @@
  */
 package interfaces;
 
+import clases.Conexion;
+import clases.Util;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
-import clases.Conexion;
 import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Calendar;
-import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -27,10 +30,11 @@ import javax.swing.JTextField;
  */
 public class Servicios_reservar extends javax.swing.JFrame {
 
-    public static String telefono, cell, mail;
-    private String reservadoPor, desde, hasta, query, nombre, apellido, te_alojamiento, te_traslado,
-            id_cliente_vincular = "";
-    public static String[] servicio = new String[25];
+//    public static String telefono, cell, mail;
+//    private String reservadoPor, desde, hasta, query, nombre, apellido, te_alojamiento, te_traslado,
+//            id_cliente_vincular = "";
+    private String[] servicio = new String[28];
+    private DefaultTableModel model = new DefaultTableModel();
 
     /**
      * Creates new form Servicios_agregar_modificar
@@ -43,11 +47,52 @@ public class Servicios_reservar extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        reservadoPor = Login.user;
-        
-        Color colorJDateFondo = new Color(204,204,204);        
-        ((JTextField)jDateChooser_fechaIda.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
-        ((JTextField)jDateChooser_fechaRegreso.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);       
+        jDialog_clientes_seleccionar.setSize(710, 500);
+        jDialog_clientes_seleccionar.setResizable(false);
+        jDialog_clientes_seleccionar.setTitle("Seleccionar cliente - " + Login.user);
+        jDialog_clientes_seleccionar.setLocationRelativeTo(null);
+        jDialog_clientes_seleccionar.setModal(true);
+
+        jTable_clientes = new JTable(model);
+        jScrollPane1.setViewportView(jTable_clientes);
+
+        model.addColumn(" ");
+        model.addColumn("Nombre");
+        model.addColumn("Apellido");
+        model.addColumn("Nacionalidad");
+        model.addColumn("Telefono");
+        model.addColumn("Mobil");
+        model.addColumn("E-mail");
+        model.addColumn("Observaciones");
+
+        Color colorJDateFondo = new Color(204, 204, 204);
+        ((JTextField) jDateChooser_fechaIda.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
+        ((JTextField) jDateChooser_fechaRegreso.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
+
+        jTable_clientes.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila_point = jTable_clientes.rowAtPoint(e.getPoint());
+                String Id_cliente_vincular = "";
+                
+                if (fila_point > -1) {
+                    Id_cliente_vincular = model.getValueAt(fila_point, 0).toString();
+
+                    int confirmacion = JOptionPane.showConfirmDialog(null, "Seguro que desea vincular el cliente \n"
+                            + "seleccionado al servicio?");
+
+                    if (confirmacion == JOptionPane.OK_OPTION) {
+                        servicio[21] = model.getValueAt(fila_point,1).toString();
+                        servicio[22] = model.getValueAt(fila_point,2).toString();
+//                        System.out.println(servicio[21] + " " + servicio[22]);
+                        Reservar_servicio(Id_cliente_vincular);
+                        jDialog_clientes_seleccionar.dispose();
+                    }
+                }
+            }
+
+        });
     }
 
     @Override
@@ -65,6 +110,15 @@ public class Servicios_reservar extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jDialog_clientes_seleccionar = new javax.swing.JDialog();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel31 = new javax.swing.JLabel();
+        jTextField_buscar = new javax.swing.JTextField();
+        jComboBox_campos = new javax.swing.JComboBox<>();
+        jButton_filtrar = new javax.swing.JButton();
+        jLabel_footer1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable_clientes = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -127,6 +181,87 @@ public class Servicios_reservar extends javax.swing.JFrame {
         jTextField_trf_credito = new javax.swing.JTextField();
         jLabel30 = new javax.swing.JLabel();
         jTextField_apellidoCliente = new javax.swing.JTextField();
+
+        jPanel2.setBackground(new java.awt.Color(153, 153, 153));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel31.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel31.setText("Seleccione el cliente que desea vincular al servicio");
+        jPanel2.add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 45, -1, -1));
+
+        jTextField_buscar.setBackground(new java.awt.Color(204, 204, 204));
+        jTextField_buscar.setForeground(new java.awt.Color(0, 0, 155));
+        jTextField_buscar.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 5, 1, 1));
+        jTextField_buscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField_buscarActionPerformed(evt);
+            }
+        });
+        jTextField_buscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextField_buscarKeyPressed(evt);
+            }
+        });
+        jPanel2.add(jTextField_buscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 40, 150, 30));
+
+        jComboBox_campos.setBackground(new java.awt.Color(153, 153, 153));
+        jComboBox_campos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Todos", "Nombre", "Telefono_fijo", "Telefono_cell", "Email" }));
+        jPanel2.add(jComboBox_campos, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 40, 90, 30));
+
+        jButton_filtrar.setBackground(new java.awt.Color(153, 153, 153));
+        jButton_filtrar.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jButton_filtrar.setText("Filtrar");
+        jButton_filtrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_filtrarActionPerformed(evt);
+            }
+        });
+        jButton_filtrar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jButton_filtrarKeyPressed(evt);
+            }
+        });
+        jPanel2.add(jButton_filtrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 415, 80, 30));
+
+        jLabel_footer1.setText("© Realizado por atstincer");
+        jPanel2.add(jLabel_footer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(265, 450, 150, 20));
+
+        jScrollPane1.setBackground(new java.awt.Color(153, 153, 153));
+
+        jTable_clientes.setBackground(new java.awt.Color(153, 153, 153));
+        jTable_clientes.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jTable_clientes.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTable_clientes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jTable_clientes.setCellSelectionEnabled(true);
+        jTable_clientes.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jScrollPane1.setViewportView(jTable_clientes);
+
+        jPanel2.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 85, 690, 300));
+
+        javax.swing.GroupLayout jDialog_clientes_seleccionarLayout = new javax.swing.GroupLayout(jDialog_clientes_seleccionar.getContentPane());
+        jDialog_clientes_seleccionar.getContentPane().setLayout(jDialog_clientes_seleccionarLayout);
+        jDialog_clientes_seleccionarLayout.setHorizontalGroup(
+            jDialog_clientes_seleccionarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog_clientes_seleccionarLayout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 710, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(369, 369, 369))
+        );
+        jDialog_clientes_seleccionarLayout.setVerticalGroup(
+            jDialog_clientes_seleccionarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog_clientes_seleccionarLayout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(421, 421, 421))
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setIconImage(getIconImage());
@@ -427,380 +562,93 @@ public class Servicios_reservar extends javax.swing.JFrame {
 
     private void jButton_ReservarServActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_ReservarServActionPerformed
         // TODO add your handling code here:
-
-        int vincular = 0, validarServ = 0;
-        String descripcionServ = jTextField_descripcionServ.getText();
-        String hotel = jTextField_hotel.getText();
-        String adultos = jTextField_adultos.getText();
-        String menores = jTextField_menor.getText();
-        String infante = jTextField_infante.getText();
-        te_alojamiento = jTextField_TEaloj.getText();
-        te_traslado = jTextField_TEtrf.getText();
-        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-        Date fecha_ida = jDateChooser_fechaIda.getDate();
-        if (fecha_ida != null) {
-            desde = formato.format(fecha_ida);
-        } else {
-            desde = "";
-        }
-        Date fecha_regreso = jDateChooser_fechaRegreso.getDate();
-        if (fecha_regreso != null) {
-            hasta = formato.format(fecha_regreso);
-        } else {
-            hasta = "";
-        }
-        String destino = jComboBox_destino.getSelectedItem().toString();
-        String proveedorTRF = jComboBox_proveedorTRF.getSelectedItem().toString();
-        String traslado = jComboBox_trf.getSelectedItem().toString();
-        Calendar calendar = Calendar.getInstance();
-        String diaReservado = Integer.toString(calendar.get(Calendar.DATE));
-        String mesReservado = Integer.toString(calendar.get(Calendar.MONTH) + 1);
-        String anioReservado = Integer.toString(calendar.get(Calendar.YEAR));
-        if(diaReservado.length() == 1){
-            diaReservado = "0" + diaReservado;            
-        }
-        if(mesReservado.length() == 1){
-            mesReservado = "0" + mesReservado;            
-        }
-        String fechaReservado = diaReservado + "/" + mesReservado + "/" + anioReservado;
-
-        String aloj_efectivo = jTextField_aloj_efectivo.getText();
-        if (!aloj_efectivo.equals("")) {
-            if (!EsDouble(aloj_efectivo)) {
-                JOptionPane.showMessageDialog(null, "Campo 'alojamiento efectivo' admite solamente números.");
-                validarServ = 1;
-            }
-        } else {
-            aloj_efectivo = "0";
-        }
-        String aloj_credito = jTextField_aloj_credito.getText();
-        if (!aloj_credito.equals("")) {
-            if (!EsDouble(aloj_credito)) {
-                JOptionPane.showMessageDialog(null, "Campo 'alojamiento crédito' admite solamente números.");
-                validarServ = 1;
-            }
-        } else {
-            aloj_credito = "0";
-        }
-        String trf_efectivo = jTextField_trf_efectivo.getText();
-        if (!trf_efectivo.equals("")) {
-            if (!EsDouble(trf_efectivo)) {
-                JOptionPane.showMessageDialog(null, "Campo 'traslado efectivo' admite solamente números.");
-                validarServ = 1;
-            }
-        } else {
-            trf_efectivo = "0";
-        }
-        String trf_credito = jTextField_trf_credito.getText();
-        if (!trf_credito.equals("")) {
-            if (!EsDouble(trf_credito)) {
-                JOptionPane.showMessageDialog(null, "Campo 'traslado crédito' admite solamente números.");
-                validarServ = 1;
-            }
-        } else {
-            trf_credito = "0";
-        }
-        String tarjetas_credito = jTextArea1_tarjetas_credito.getText().toUpperCase();
-
-//        System.out.print("H efectivo: " + aloj_efectivo + ", credito: " + aloj_credito + "\n"
-//                + "TRF efectivo: " + trf_efectivo + ", credito: " + trf_credito + "\n");
-
-        String confirmacion = jTextField_confirmacion.getText().toUpperCase();
-        String observacionesServ = jTextArea1_observacionesServicio.getText();
-        nombre = jTextField_nombreCliente.getText();
-        apellido = jTextField_apellidoCliente.getText();
-        telefono = jTextField_telefonoCliente.getText();
-        cell = jTextField_celularCliente.getText();
-        mail = jTextField_EmailCliente.getText();
-        String nacionalidad = jTextField_nacionalidadCliente.getText();
-        String observacionesCliente = jTextArea1_observacionesCliente.getText();
+        Vaciar_array(servicio);
+        Llenar_array();
 
         //validarServ = 0 los campos validados
         //validarServ = 1 faltan campos por llenar
         //vincular = 1 se ha encontrado coincidencia con registro en tabla clientes
         //vincular = 0 no se encontró coincidencias
-        //validando campos info servicio
-        if (descripcionServ.equals("") || desde.equals("") || hasta.equals("") || nombre.equals("")) {
-            JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente los campos 'Descripcion', 'Adultos', \n"
-                    + "'Desde', 'Hasta' y 'Nombre del Cliente'.");
-            validarServ = 1;
-        }
+        if (Validar_campos()) {
+            if (!servicio[23].equals("") || !servicio[24].equals("") || !servicio[25].equals("")) {
+                //telefono-cell-mail
+                //quiere decir que ingresaron info de cliente para vincular al servicio
+                if (Coinciden_clientes()) {
+                    Util.VaciarTabla(model);
+                    try {
+                        Connection cn = Conexion.conectar();
+                        PreparedStatement pst = cn.prepareStatement(QueryCoincidenciaCliente());
 
-        if (!adultos.equals("")) {//validando campo adultos
-            if (!EsInt(adultos)) {
-                JOptionPane.showMessageDialog(null, "El campo 'adultos' admite solo números enteros.");
-                validarServ = 1;
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'adultos'.");
-            validarServ = 1;
-        }
+                        ResultSet rs = pst.executeQuery();
 
-        if (!menores.equals("")) {//validando campo menores
-            if (!EsInt(menores)) {
-                JOptionPane.showMessageDialog(null, "El campo 'niños' admite solo números enteros.");
-                validarServ = 1;
-            }
-        } else {
-            menores = "0";
-        }
-
-        if (!infante.equals("")) {//validando campo infante
-            if (!EsInt(infante)) {
-                JOptionPane.showMessageDialog(null, "El campo 'infante' admite solo números enteros.");
-                validarServ = 1;
-            }
-        } else {
-            infante = "0";
-        }
-
-//        //validando campo TE_traslado, trf efectivo y crédito
-//        if (traslado.equals("Si") || traslado.equals("Solo_ida") || traslado.equals("Solo_regreso")
-//                || traslado.equals("Solo_traslado")) {
-//            if (te_traslado.equals("") || (trf_efectivo.equals("") && trf_credito.equals(""))) {
-//                JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE traslado'\n"
-//                        + "y los valores de efectivo/crédito correspondientes.");
-//                validarServ = 1;
-//            }
-//        } else {
-//            proveedorTRF = "";            
-//        }
-        //validando campo TE_traslado, trf efectivo y crédito
-        if (traslado.equals("No")) {
-            proveedorTRF = "";
-            te_traslado = "";
-            trf_efectivo = "0";
-            trf_credito = "0";
-            jTextField_TEtrf.setText("");
-            jTextField_trf_efectivo.setText("");
-            jTextField_trf_credito.setText("");
-        } else {
-            if (te_traslado.equals("") || (trf_efectivo.equals("0") && trf_credito.equals("0"))) {
-                JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE traslado'\n"
-                        + "y los valores de efectivo/crédito correspondientes.");
-                validarServ = 1;
-            }
-        }
-
-        //validando campo TE_alojamiento, alojamiento efectivo y crédito
-        if (traslado.equals("Solo_traslado")) {
-            te_alojamiento = "";
-            aloj_efectivo = "0";
-            aloj_credito = "0";
-            jTextField_TEaloj.setText("");
-            jTextField_aloj_efectivo.setText("");
-            jTextField_aloj_credito.setText("");
-        } else {
-            if (te_alojamiento.equals("") || (aloj_efectivo.equals("0") && aloj_credito.equals("0"))) {
-                JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE_alojamiento'\n"
-                        + "y los valores de efectivo/crédito correspondientes.");
-                validarServ = 1;
-            }
-        }
-
-        if (!aloj_credito.equals("0") || !trf_credito.equals("0")) {//validando campo tarjetas de crédito 
-            if (tarjetas_credito.equals("")) {
-                JOptionPane.showMessageDialog(null, "Asegúrese de llenar el campo 'Tarjetas de crédito'.");
-                validarServ = 1;
-            }
-//            else {
-//                double a_double = (double) tarjetas_credito.length() / 16;
-//                int a_int = (int) a_double;
-//                System.out.println("double = " + a_double + "\nInt = " + a_int + "\nResult = " + (a_double-a_int) + "\n");
-//                System.out.println("TarjetaCredito.length: " + tarjetas_credito.length());
-//                System.out.println("TarjetaCredito: " + tarjetas_credito);
-//                if ((a_double - a_int) != 0.0) {
-//                    JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'Tarjetas de crédito'.");
-//                    validarServ = 1;
-//                }
-//            }
-        }
-
-        if (validarServ == 0) {//campos validados
-            try {
-                Connection cn = Conexion.conectar();
-                //comprobando existencia de TE_alojamiento ó TE_traslado en BD
-                PreparedStatement pst = cn.prepareStatement(QueryVerificarCoincidenciaTE());
-
-                ResultSet rs = pst.executeQuery();
-
-                if (rs.next()) {
-                    JOptionPane.showMessageDialog(null, "El ticket de alojamiento o de traslado coincide con los datos \\n"
-                            + "de algún otro servicio reservado con anterioridad. Chequee por favor.");
+                        while (rs.next()) {
+                            //existe coincidencia...instancia clase para seleccionar cliente e/ los registrados
+                            Object[] fila = new Object[8];
+                            for (int i = 0; i < fila.length; i++) {
+                                fila[i] = rs.getString(i + 1);
+                            }
+                            model.addRow(fila);
+                        }
+                        cn.close();
+                        JOptionPane.showMessageDialog(null,"Los datos ingresados coinciden con uno o mas clientes \n"
+                                + "registrados ya con anterioridad. Seleccione de la tabla si desea vincular alguno \n"
+                                + "de estos clientes al servicio actual.");
+                        jDialog_clientes_seleccionar.setVisible(true);
+                    } catch (SQLException e) {
+                        System.err.println("Error chequeando coincidencia con clientes registrados: " + e);
+                        JOptionPane.showMessageDialog(null, "!!Error chequeando coincidencia con clientes "
+                                + "registrados. Contacte al administrador.");
+                    }
                 } else {
-                    if (!telefono.equals("") || !cell.equals("") || !mail.equals("")) {
-                        //quiere decir que ingresaron info de cliente para vincular al servicio
-                        try {//Verificando si datos ingresados de cliente coinciden con clientes registrados ya                            
-                            pst = cn.prepareStatement(QueryVerificarCoincidenciaCliente());
+                    try {//no existe coincidencia---registrando cliente nuevo
+                        Connection cn = Conexion.conectar();
+                        PreparedStatement pst = cn.prepareStatement("insert into Clientes values (?,?,?,?,?,?,?,?)");
 
-                            rs = pst.executeQuery();
+                        pst.setInt(1, 0);
+                        pst.setString(2, servicio[21]);//nombre
+                        pst.setString(3, servicio[22]);//apellido
+                        pst.setString(4, servicio[26]);//nacionalidad
+                        pst.setString(5, servicio[23]);//teléfono
+                        pst.setString(6, servicio[24]);//cell
+                        pst.setString(7, servicio[25]);//mail
+                        pst.setString(8, servicio[27]);//observaciones cliente
 
-                            if (rs.next()) {
-                                //existe coincidencia...instancia clase para seleccionar cliente e/ los registrados
-                                vincular = 1;
+                        pst.executeUpdate();
+                        cn.close();
+                    } catch (SQLException e) {
+                        System.err.println("Error en conexion al insertar valores en tabla Clientes. " + e);
+                        JOptionPane.showMessageDialog(null, "Error en conexion al insertar valores en tabla Clientes. Favor "
+                                + "contacte al administrador.");
+                    }
 
-                                servicio[0] = "";//campo Id_cliente
-                                servicio[1] = descripcionServ;
-                                servicio[2] = te_alojamiento;
-                                servicio[3] = hotel;
-                                servicio[4] = destino;
-                                servicio[5] = desde;
-                                servicio[6] = hasta;
-                                servicio[7] = traslado;
-                                servicio[8] = te_traslado;
-                                servicio[9] = fechaReservado;
-                                servicio[10] = reservadoPor;
-                                servicio[11] = observacionesServ;
-                                servicio[12] = proveedorTRF;
-                                servicio[13] = confirmacion;
-                                servicio[14] = adultos;
-                                servicio[15] = "";//campo "historial modificaciones"
-                                servicio[16] = "";//campo "nombre"
-                                servicio[17] = menores;
-                                servicio[18] = infante;
-                                servicio[19] = "";//campo "apellido"
-                                servicio[20] = aloj_efectivo;
-                                servicio[21] = trf_efectivo;
-                                servicio[22] = aloj_credito;
-                                servicio[23] = trf_credito;
-                                servicio[24] = tarjetas_credito;
+                    String id_cliente_vincular = "";
 
-                                Clientes_seleccionar clientes_seleccionar = new Clientes_seleccionar();
-                                clientes_seleccionar.setVisible(true);
-                            }
-                        } catch (SQLException e) {
-                            System.err.println("Error chequeando coincidencia con clientes registrados: " + e);
-                            JOptionPane.showMessageDialog(null, "!!Error chequeando coincidencia con clientes registrados. "
-                                    + "Contacte al administrador.");
+                    try {//recuperando Id de cliente registrado
+                        Connection cn = Conexion.conectar();
+                        PreparedStatement pst = cn.prepareStatement(QueryRecuperarId());
+
+                        ResultSet rs = pst.executeQuery();
+
+                        if (rs.next()) {
+                            id_cliente_vincular = rs.getString(1);
                         }
-
-                        if (vincular == 0) {//no existe coincidencia
-                            try {//registrando cliente nuevo                               
-                                pst = cn.prepareStatement("insert into Clientes values (?,?,?,?,?,?,?,?)");
-
-                                pst.setInt(1, 0);
-                                pst.setString(2, nombre);
-                                pst.setString(3, apellido);
-                                pst.setString(4, nacionalidad);
-                                pst.setString(5, telefono);
-                                pst.setString(6, cell);
-                                pst.setString(7, mail);
-                                pst.setString(8, observacionesCliente);
-
-                                pst.executeUpdate();
-
-                            } catch (SQLException e) {
-                                System.err.println("Error en conexion al insertar valores en tabla Clientes. " + e);
-                                JOptionPane.showMessageDialog(null, "Error en conexion al insertar valores en tabla Clientes. Favor "
-                                        + "contacte al administrador.");
-                            }
-
-                            try {//recuperando Id de cliente registrado                                
-                                pst = cn.prepareStatement(QueryRecuperarId());
-
-                                rs = pst.executeQuery();
-
-                                while (rs.next()) {
-                                    id_cliente_vincular = rs.getString(1);
-                                }
-                            } catch (SQLException e) {
-                                System.err.println("Error al conectar para recuperar Id del cliente registrado." + e);
-                                JOptionPane.showMessageDialog(null, "Error al conectar con la BD. Favor contacte con el administrador.");
-                            }
-
-                            try {//registrando datos en tabla servicio                                
-                                pst = cn.prepareStatement("insert into servicios values (?,?,?,?,?,?,?,"
-                                        + "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-
-                                pst.setInt(1, 0);
-                                pst.setString(2, id_cliente_vincular);
-                                pst.setString(3, descripcionServ);
-                                pst.setString(4, te_alojamiento);
-                                pst.setString(5, hotel);
-                                pst.setString(6, destino);
-                                pst.setString(7, desde);
-                                pst.setString(8, hasta);
-                                pst.setString(9, traslado);
-                                pst.setString(10, te_traslado);
-                                pst.setString(11, fechaReservado);
-                                pst.setString(12, reservadoPor);
-                                pst.setString(13, observacionesServ);
-                                pst.setString(14, proveedorTRF);
-                                pst.setString(15, confirmacion);
-                                pst.setString(16, adultos);
-                                pst.setString(17, "");//historial modificaciones
-                                pst.setString(18, nombre);
-                                pst.setString(19, menores);
-                                pst.setString(20, infante);
-                                pst.setString(21, apellido);
-                                pst.setDouble(22, Double.parseDouble(aloj_efectivo));
-                                pst.setDouble(23, Double.parseDouble(trf_efectivo));
-                                pst.setDouble(24, Double.parseDouble(aloj_credito));
-                                pst.setDouble(25, Double.parseDouble(trf_credito));
-                                pst.setString(26, tarjetas_credito);
-
-                                pst.executeUpdate();
-
-                                JOptionPane.showMessageDialog(null, "Servicio reservado correctamente");
-                                Limpiar();
-
-                            } catch (SQLException e) {
-                                System.err.println("Error llenando tabla servicios: " + e);
-                                JOptionPane.showMessageDialog(null, "Error llenando tabla servicios. Por favor contacte al administrador");
-                            }
-                        }
-
-                    } else {
-                        try {//registrando datos en tabla servicio                            
-                            pst = cn.prepareStatement("insert into servicios values (?,?,?,?,?,?,?,?,?,"
-                                    + "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-
-                            pst.setInt(1, 0);
-                            pst.setString(2, id_cliente_vincular);
-                            pst.setString(3, descripcionServ);
-                            pst.setString(4, te_alojamiento);
-                            pst.setString(5, hotel);
-                            pst.setString(6, destino);
-                            pst.setString(7, desde);
-                            pst.setString(8, hasta);
-                            pst.setString(9, traslado);
-                            pst.setString(10, te_traslado);
-                            pst.setString(11, fechaReservado);
-                            pst.setString(12, reservadoPor);
-                            pst.setString(13, observacionesServ);
-                            pst.setString(14, proveedorTRF);
-                            pst.setString(15, confirmacion);
-                            pst.setString(16, adultos);
-                            pst.setString(17, "");
-                            pst.setString(18, nombre);
-                            pst.setString(19, menores);
-                            pst.setString(20, infante);
-                            pst.setString(21, apellido);
-                            pst.setDouble(22, Double.parseDouble(aloj_efectivo));
-                            pst.setDouble(23, Double.parseDouble(trf_efectivo));
-                            pst.setDouble(24, Double.parseDouble(aloj_credito));
-                            pst.setDouble(25, Double.parseDouble(trf_credito));
-                            pst.setString(26, tarjetas_credito);
-
-                            pst.executeUpdate();
-
-                            JOptionPane.showMessageDialog(null, "Servicio reservado correctamente");
-                            Limpiar();
-
-                        } catch (SQLException e) {
-                            System.err.println("Error llenando tabla servicios: " + e);
-                            JOptionPane.showMessageDialog(null, "Error llenando tabla servicios. Por favor contacte al administrador");
-                        }
+                        cn.close();
+                    } catch (SQLException e) {
+                        System.err.println("Error al conectar para recuperar Id del cliente registrado." + e);
+                        JOptionPane.showMessageDialog(null, "Error al conectar con la BD. Favor contacte con el administrador.");
+                    }
+                    
+                    if(!id_cliente_vincular.equals("")){
+                        Reservar_servicio(id_cliente_vincular);
+                    }else{
+                        JOptionPane.showMessageDialog(null, "!!Error tratando de recuperar 'Id' del nuevo cliente.\\n"
+                                + " Favor contacte al administrador.");
                     }
                 }
-                cn.close();
-            } catch (SQLException e) {
-                System.err.println("Error conectando con BD: " + e);
+            } else {
+                Reservar_servicio("");
             }
-
         }
-
-
     }//GEN-LAST:event_jButton_ReservarServActionPerformed
 
     private void jTextField_aloj_efectivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_aloj_efectivoActionPerformed
@@ -810,6 +658,29 @@ public class Servicios_reservar extends javax.swing.JFrame {
     private void jTextField_trf_efectivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_trf_efectivoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField_trf_efectivoActionPerformed
+
+    private void jTextField_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_buscarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField_buscarActionPerformed
+
+    private void jTextField_buscarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_buscarKeyPressed
+        // TODO add your handling code here:
+        if (evt.getExtendedKeyCode() == KeyEvent.VK_ENTER) {
+            Filtrar();
+        }
+    }//GEN-LAST:event_jTextField_buscarKeyPressed
+
+    private void jButton_filtrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_filtrarActionPerformed
+        // TODO add your handling code here:
+        Filtrar();
+    }//GEN-LAST:event_jButton_filtrarActionPerformed
+
+    private void jButton_filtrarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButton_filtrarKeyPressed
+        // TODO add your handling code here:
+        if (evt.getExtendedKeyCode() == KeyEvent.VK_ENTER) {
+            Filtrar();
+        }
+    }//GEN-LAST:event_jButton_filtrarKeyPressed
 
     /**
      * @param args the command line arguments
@@ -838,6 +709,12 @@ public class Servicios_reservar extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -849,11 +726,14 @@ public class Servicios_reservar extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_ReservarServ;
+    private javax.swing.JButton jButton_filtrar;
+    private javax.swing.JComboBox<String> jComboBox_campos;
     private javax.swing.JComboBox<String> jComboBox_destino;
     private javax.swing.JComboBox<String> jComboBox_proveedorTRF;
     private javax.swing.JComboBox<String> jComboBox_trf;
     private com.toedter.calendar.JDateChooser jDateChooser_fechaIda;
     private com.toedter.calendar.JDateChooser jDateChooser_fechaRegreso;
+    private javax.swing.JDialog jDialog_clientes_seleccionar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -878,6 +758,7 @@ public class Servicios_reservar extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
+    private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -885,10 +766,14 @@ public class Servicios_reservar extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabel_footer;
+    private javax.swing.JLabel jLabel_footer1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JTable jTable_clientes;
     private javax.swing.JTextArea jTextArea1_observacionesCliente;
     private javax.swing.JTextArea jTextArea1_observacionesServicio;
     private javax.swing.JTextArea jTextArea1_tarjetas_credito;
@@ -899,6 +784,7 @@ public class Servicios_reservar extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField_aloj_credito;
     private javax.swing.JTextField jTextField_aloj_efectivo;
     private javax.swing.JTextField jTextField_apellidoCliente;
+    private javax.swing.JTextField jTextField_buscar;
     private javax.swing.JTextField jTextField_celularCliente;
     private javax.swing.JTextField jTextField_confirmacion;
     private javax.swing.JTextField jTextField_descripcionServ;
@@ -914,58 +800,69 @@ public class Servicios_reservar extends javax.swing.JFrame {
 
     //query para recuperar Id del cliente registrado
     public String QueryRecuperarId() {
-        if (!telefono.equals("") && cell.equals("") && mail.equals("")) {//buscar solo por telefono
-            query = "select Id_cliente from Clientes where Nombre = '" + nombre + "' and Telefono_fijo = '" + telefono + "'";
-        } else if (!telefono.equals("") && !cell.equals("") && mail.equals("")) {//buscar por telefono y cell
-            query = "select Id_cliente from Clientes where Nombre = '" + nombre + "' and Telefono_fijo = '" + telefono + "' "
-                    + "and  Telefono_cell = '" + cell + "'";
-        } else if (!telefono.equals("") && cell.equals("") && !mail.equals("")) {//buscar por telefono y mail
-            query = "select Id_cliente from Clientes where Nombre = '" + nombre + "' and Telefono_fijo = '" + telefono + "' "
-                    + "and  E_mail = '" + mail + "'";
-        } else if (!telefono.equals("") && !cell.equals("") && !mail.equals("")) {//buscar por los tres
-            query = "select Id_cliente from Clientes where Nombre = '" + nombre + "' and Telefono_fijo = '" + telefono + "' "
-                    + "and  Telefono_cell = '" + cell + "' and E_mail = '" + mail + "'";
-        } else if (telefono.equals("") && !cell.equals("") && mail.equals("")) {//buscar por cell
-            query = "select Id_cliente from Clientes where Nombre = '" + nombre + "' and Telefono_cell = '" + cell + "'";
-        } else if (telefono.equals("") && !cell.equals("") && !mail.equals("")) {//buscar por cell y mail
-            query = "select Id_cliente from Clientes where Nombre = '" + nombre + "' and Telefono_cell = '" + cell + "' "
-                    + "and E_mail = '" + mail + "'";
-        } else if (telefono.equals("") && cell.equals("") && !mail.equals("")) {//buscar por mail
-            query = "select Id_cliente from Clientes where Nombre = '" + nombre + "' and E_mail = '" + mail + "'";
+        String query = "";
+        if (!servicio[23].equals("") && servicio[24].equals("") && servicio[25].equals("")) {//buscar solo por telefono
+            query = "select Id_cliente from Clientes where Nombre = '" + servicio[21] + "' and Telefono_fijo = '" + servicio[23] + "'";
+        } else if (!servicio[23].equals("") && !servicio[24].equals("") && servicio[25].equals("")) {//buscar por telefono y cell
+            query = "select Id_cliente from Clientes where Nombre = '" + servicio[21] + "' and Telefono_fijo = '" + servicio[23] + "' "
+                    + "and  Telefono_cell = '" + servicio[24] + "'";
+        } else if (!servicio[23].equals("") && servicio[24].equals("") && !servicio[25].equals("")) {//buscar por telefono y mail
+            query = "select Id_cliente from Clientes where Nombre = '" + servicio[21] + "' and Telefono_fijo = '" + servicio[23] + "' "
+                    + "and  E_mail = '" + servicio[25] + "'";
+        } else if (!servicio[23].equals("") && !servicio[24].equals("") && !servicio[25].equals("")) {//buscar por los tres
+            query = "select Id_cliente from Clientes where Nombre = '" + servicio[21] + "' and Telefono_fijo = '" + servicio[23] + "' "
+                    + "and  Telefono_cell = '" + servicio[24] + "' and E_mail = '" + servicio[25] + "'";
+        } else if (servicio[23].equals("") && !servicio[24].equals("") && servicio[25].equals("")) {//buscar por cell
+            query = "select Id_cliente from Clientes where Nombre = '" + servicio[21] + "' and Telefono_cell = '" + servicio[24] + "'";
+        } else if (servicio[23].equals("") && !servicio[24].equals("") && !servicio[25].equals("")) {//buscar por cell y mail
+            query = "select Id_cliente from Clientes where Nombre = '" + servicio[21] + "' and Telefono_cell = '" + servicio[24] + "' "
+                    + "and E_mail = '" + servicio[25] + "'";
+        } else if (servicio[23].equals("") && servicio[24].equals("") && !servicio[25].equals("")) {//buscar por mail
+            query = "select Id_cliente from Clientes where Nombre = '" + servicio[21] + "' and E_mail = '" + servicio[25] + "'";
         }
         return query;
     }
 
     //query para verificar si info coincide con algun cliente registrado anteriormente
-    public String QueryVerificarCoincidenciaCliente() {
-        if (!telefono.equals("") && cell.equals("") && mail.equals("")) {//buscar solo por telefono
-            query = "select * from Clientes where Telefono_fijo = '" + telefono + "'";
-        } else if (!telefono.equals("") && !cell.equals("") && mail.equals("")) {//buscar por telefono y cell
-            query = "select * from Clientes where Telefono_fijo = '" + telefono + "' and  Telefono_cell = '" + cell + "'";
-        } else if (!telefono.equals("") && cell.equals("") && !mail.equals("")) {//buscar por telefono y mail
-            query = "select * from Clientes where Telefono_fijo = '" + telefono + "' and  E_mail = '" + mail + "'";
-        } else if (!telefono.equals("") && !cell.equals("") && !mail.equals("")) {//buscar por los telefono, cell y mail
-            query = "select * from Clientes where Telefono_fijo = '" + telefono + "' and  Telefono_cell = '" + cell + "' "
-                    + "and E_mail = '" + mail + "'";
-        } else if (telefono.equals("") && !cell.equals("") && mail.equals("")) {//buscar por cell
-            query = "select * from Clientes where Telefono_cell = '" + cell + "'";
-        } else if (telefono.equals("") && !cell.equals("") && !mail.equals("")) {//buscar por cell y mail
-            query = "select * from Clientes where Telefono_cell = '" + cell + "' and E_mail = '" + mail + "'";
-        } else if (telefono.equals("") && cell.equals("") && !mail.equals("")) {//buscar por mail
-            query = "select * from Clientes where E_mail = '" + mail + "'";
+    public String QueryCoincidenciaCliente() {
+        String query = "";
+        if (!servicio[23].equals("") && servicio[24].equals("") && servicio[25].equals("")) {//buscar solo por telefono
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, Telefono_cell, E_mail, "
+                    + "Observaciones from Clientes where Telefono_fijo = '" + servicio[23] + "'";
+        } else if (!servicio[23].equals("") && !servicio[24].equals("") && servicio[25].equals("")) {//buscar por telefono y cell
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, Telefono_cell, E_mail, "
+                    + "Observaciones from Clientes where Telefono_fijo = '" + servicio[23] + "' or "
+                    + "Telefono_cell = '" + servicio[24] + "'";
+        } else if (!servicio[23].equals("") && servicio[24].equals("") && !servicio[25].equals("")) {//buscar por telefono y mail
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, Telefono_cell, E_mail, Observaciones "
+                    + "from Clientes where Telefono_fijo = '" + servicio[23] + "' or  E_mail = '" + servicio[25] + "'";
+        } else if (!servicio[23].equals("") && !servicio[24].equals("") && !servicio[25].equals("")) {//buscar por los telefono, cell y mail
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, Telefono_cell, E_mail, Observaciones "
+                    + "from Clientes where Telefono_fijo = '" + servicio[23] + "' or  Telefono_cell = '" + servicio[24] + "'"
+                    + " or E_mail = '" + servicio[25] + "'";
+        } else if (servicio[23].equals("") && !servicio[24].equals("") && servicio[25].equals("")) {//buscar por cell
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, Telefono_cell, E_mail, Observaciones "
+                    + "from Clientes where Telefono_cell = '" + servicio[24] + "'";
+        } else if (servicio[23].equals("") && !servicio[24].equals("") && !servicio[25].equals("")) {//buscar por cell y mail
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, Telefono_cell, E_mail, Observaciones "
+                    + "from Clientes where Telefono_cell = '" + servicio[24] + "' or E_mail = '" + servicio[25] + "'";
+        } else if (servicio[23].equals("") && servicio[24].equals("") && !servicio[25].equals("")) {//buscar por mail
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, Telefono_cell, E_mail, Observaciones "
+                    + "from Clientes where E_mail = '" + servicio[25] + "'";
         }
         return query;
     }
 
     //query para verificar si info coincide con algun ticket registrado anteriormente
     public String QueryVerificarCoincidenciaTE() {
-        if (!te_alojamiento.equals("") && te_traslado.equals("")) {//buscar por te_alojamiento
-            query = "select Id_servicio from Servicios where TE_alojamiento = '" + te_alojamiento + "'";
-        } else if (!te_alojamiento.equals("") && !te_traslado.equals("")) {//buscar por te_alojamiento y te_traslado
-            query = "select Id_servicio from Servicios where TE_alojamiento = '" + te_alojamiento + "' "
-                    + "or TE_traslado = '" + te_traslado + "'";
-        } else if (te_alojamiento.equals("") && !te_traslado.equals("")) {//buscar por te_traslado
-            query = "select Id_servicio from Servicios where TE_traslado = '" + te_traslado + "'";
+        String query = "";
+        if (!servicio[5].equals("") && servicio[7].equals("")) {//buscar por te_alojamiento
+            query = "select Id_servicio from Servicios where TE_alojamiento = '" + servicio[5] + "'";
+        } else if (!servicio[5].equals("") && !servicio[7].equals("")) {//buscar por te_alojamiento y te_traslado
+            query = "select Id_servicio from Servicios where TE_alojamiento = '" + servicio[5] + "' "
+                    + "or TE_traslado = '" + servicio[7] + "'";
+        } else if (servicio[5].equals("") && !servicio[7].equals("")) {//buscar por te_traslado
+            query = "select Id_servicio from Servicios where TE_traslado = '" + servicio[7] + "'";
         }
         return query;
     }
@@ -997,29 +894,305 @@ public class Servicios_reservar extends javax.swing.JFrame {
         jTextArea1_tarjetas_credito.setText("");
     }
 
-//    //para pasar vector servicio
-//    public String getServicio(int i){
-//        return servicio[i];
-//    }
+    private void Vaciar_array(String[] list) {
+        for (int i = 0; i < list.length; i++) {
+            list[i] = "";
+        }
+    }
+
+    private void Llenar_array() {
+        servicio[0] = jTextField_descripcionServ.getText();
+        servicio[1] = jTextField_hotel.getText();
+        servicio[2] = jTextField_adultos.getText();
+        servicio[3] = jTextField_menor.getText();
+        servicio[4] = jTextField_infante.getText();
+        servicio[5] = jTextField_TEaloj.getText();
+        servicio[6] = jTextField_confirmacion.getText().toUpperCase();
+        servicio[7] = jTextField_TEtrf.getText();
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        Date fecha_ida = jDateChooser_fechaIda.getDate();
+        if (fecha_ida != null) {
+            servicio[8] = formato.format(fecha_ida);
+        } else {
+            servicio[8] = "";
+        }
+        Date fecha_regreso = jDateChooser_fechaRegreso.getDate();
+        if (fecha_regreso != null) {
+            servicio[9] = formato.format(fecha_regreso);
+        } else {
+            servicio[9] = "";
+        }
+        servicio[10] = jComboBox_proveedorTRF.getSelectedItem().toString();
+        servicio[11] = jComboBox_trf.getSelectedItem().toString();
+        servicio[12] = jComboBox_destino.getSelectedItem().toString();
+        servicio[13] = jTextField_aloj_efectivo.getText();
+        servicio[14] = jTextField_aloj_credito.getText();
+        servicio[15] = jTextField_trf_efectivo.getText();
+        servicio[16] = jTextField_trf_credito.getText();
+        servicio[17] = jTextArea1_tarjetas_credito.getText().toUpperCase();
+        servicio[18] = jTextArea1_observacionesServicio.getText();
+
+//        Calendar calendar = Calendar.getInstance();
+//        String diaReservado = Integer.toString(calendar.get(Calendar.DATE));
+//        String mesReservado = Integer.toString(calendar.get(Calendar.MONTH) + 1);
+//        String anioReservado = Integer.toString(calendar.get(Calendar.YEAR));
+//        if(diaReservado.length() == 1){
+//            diaReservado = "0" + diaReservado;            
+//        }
+//        if(mesReservado.length() == 1){
+//            mesReservado = "0" + mesReservado;            
+//        }
+//        String fecha_reservado = diaReservado + "/" + mesReservado + "/" + anioReservado;
+        servicio[19] = Util.getFecha_actual();
+        servicio[20] = Login.user;
+        servicio[21] = jTextField_nombreCliente.getText();
+        servicio[22] = jTextField_apellidoCliente.getText();
+        servicio[23] = jTextField_telefonoCliente.getText();
+        servicio[24] = jTextField_celularCliente.getText();
+        servicio[25] = jTextField_EmailCliente.getText();
+        servicio[26] = jTextField_nacionalidadCliente.getText();
+        servicio[27] = jTextArea1_observacionesCliente.getText();
+    }
+
+    private boolean Validar_campos() {
+        if (!servicio[13].equals("")) {
+            if (!Util.EsDouble(servicio[13])) {
+                JOptionPane.showMessageDialog(null, "Campo 'alojamiento efectivo' admite solamente números.");
+                return false;
+            }
+        } else {
+            servicio[13] = "0";
+        }
+        if (!servicio[14].equals("")) {
+            if (!Util.EsDouble(servicio[14])) {
+                JOptionPane.showMessageDialog(null, "Campo 'alojamiento crédito' admite solamente números.");
+                return false;
+            }
+        } else {
+            servicio[14] = "0";
+        }
+        if (!servicio[15].equals("")) {
+            if (!Util.EsDouble(servicio[15])) {
+                JOptionPane.showMessageDialog(null, "Campo 'traslado efectivo' admite solamente números.");
+                return false;
+            }
+        } else {
+            servicio[15] = "0";
+        }
+        if (!servicio[16].equals("")) {
+            if (!Util.EsDouble(servicio[16])) {
+                JOptionPane.showMessageDialog(null, "Campo 'traslado crédito' admite solamente números.");
+                return false;
+            }
+        } else {
+            servicio[16] = "0";
+        }
+
+        //validando campos info servicio (descripcion, desde, hasta, nombre cliente)
+        if (servicio[0].equals("") || servicio[8].equals("") || servicio[9].equals("") || servicio[21].equals("")) {
+            JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente los campos 'Descripcion',\n"
+                    + "'Desde', 'Hasta' y 'Nombre del Cliente'.");
+            return false;
+        }
+
+        if (!servicio[2].equals("")) {//validando campo adultos
+            if (!Util.EsInt(servicio[2])) {
+                JOptionPane.showMessageDialog(null, "El campo 'adultos' admite solo números enteros.");
+                return false;
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'adultos'.");
+            return false;
+        }
+
+        if (!servicio[3].equals("")) {//validando campo menores
+            if (!Util.EsInt(servicio[3])) {
+                JOptionPane.showMessageDialog(null, "El campo 'niños' admite solo números enteros.");
+                return false;
+            }
+        } else {
+            servicio[3] = "0";
+        }
+
+        if (!servicio[4].equals("")) {//validando campo infante
+            if (!Util.EsInt(servicio[4])) {
+                JOptionPane.showMessageDialog(null, "El campo 'infante' admite solo números enteros.");
+                return false;
+            }
+        } else {
+            servicio[4] = "0";
+        }
+
+        //validando campo TE_traslado, trf efectivo y crédito
+        if (servicio[11].equals("No")) {//traslado
+            servicio[10] = "";//proveedor
+            servicio[7] = "";//TE trf
+            servicio[15] = "0";//efectivo trf
+            servicio[16] = "0";//crédito trf
+            jTextField_TEtrf.setText("");
+            jTextField_trf_efectivo.setText("");
+            jTextField_trf_credito.setText("");
+        } else {//TE trf - efectivo trf - credito trf
+            if (servicio[7].equals("") || (servicio[15].equals("0") && servicio[16].equals("0"))) {
+                JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE traslado'\n"
+                        + "y los valores de efectivo/crédito correspondientes.");
+                return false;
+            }
+        }
+
+        //validando campo TE_alojamiento, alojamiento efectivo y crédito
+        if (servicio[11].equals("Solo_traslado")) {//traslado
+            servicio[5] = "";//TE alojamiento
+            servicio[13] = "0";//efectivo hotel
+            servicio[14] = "0";//crédito hotel
+            jTextField_TEaloj.setText("");
+            jTextField_aloj_efectivo.setText("");
+            jTextField_aloj_credito.setText("");
+        } else {//TE alojamiento - efectivo Hotel - crédito Hotel
+            if (servicio[5].equals("") || (servicio[13].equals("0") && servicio[14].equals("0"))) {
+                JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE_alojamiento'\n"
+                        + "y los valores de efectivo/crédito correspondientes.");
+                return false;
+            }
+        }
+
+        if (!servicio[14].equals("0") || !servicio[16].equals("0")) {//validando campo tarjetas de crédito 
+            if (servicio[17].equals("")) {
+                JOptionPane.showMessageDialog(null, "Asegúrese de llenar el campo 'Tarjetas de crédito'.");
+                return false;
+            }
+        }
+        try {
+            Connection cn = Conexion.conectar();
+            //comprobando existencia de TE_alojamiento ó TE_traslado en BD
+            PreparedStatement pst = cn.prepareStatement(QueryVerificarCoincidenciaTE());
+
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                JOptionPane.showMessageDialog(null, "El ticket de alojamiento o de traslado coincide con los datos \\n"
+                        + "de algún otro servicio reservado con anterioridad. Chequee por favor.");
+                return false;
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage().toString());
+        }
+
+        return true;
+    }
+
+    private boolean Coinciden_clientes() {
+        try {//Verificando si datos ingresados de cliente coinciden con clientes registrados ya
+            Connection cn = Conexion.conectar();
+            PreparedStatement pst = cn.prepareStatement(QueryCoincidenciaCliente());
+
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                //existe coincidencia...instancia clase para seleccionar cliente e/ los registrados
+                cn.close();
+                return true;
+            } else {
+                cn.close();
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error chequeando coincidencia con clientes registrados: " + e);
+            JOptionPane.showMessageDialog(null, "!!Error chequeando coincidencia con clientes "
+                    + "registrados. Contacte al administrador.");
+        }
+        return false;
+    }
+
+    private void Reservar_servicio(String id_cliente) {
+        try {//registrando datos en tabla servicio
+            Connection cn = Conexion.conectar();
+            PreparedStatement pst = cn.prepareStatement("insert into servicios values (?,?,?,?,?,?,?,"
+                    + "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+
+            pst.setInt(1, 0);
+            pst.setString(2, id_cliente);
+            pst.setString(3, servicio[0]);//decripcion serv
+            pst.setString(4, servicio[5]);//TE Hotel
+            pst.setString(5, servicio[1]);//Hotel
+            pst.setString(6, servicio[12]);//Destino
+            pst.setString(7, servicio[8]);//desde
+            pst.setString(8, servicio[9]);//hasta
+            pst.setString(9, servicio[11]);//traslado
+            pst.setString(10, servicio[7]);//TE trf
+            pst.setString(11, servicio[19]);//fecha reservado
+            pst.setString(12, servicio[20]);//reservado por
+            pst.setString(13, servicio[18]);//observaciones serv
+            pst.setString(14, servicio[10]);//proveedor
+            pst.setString(15, servicio[6]);//confirmacion
+            pst.setString(16, servicio[2]);//adultos
+            pst.setString(17, "");//historial modificaciones
+            pst.setString(18, servicio[21]);//nombre
+            pst.setString(19, servicio[3]);//menores
+            pst.setString(20, servicio[4]);//infante
+            pst.setString(21, servicio[22]);//apellido
+            pst.setDouble(22, Double.parseDouble(servicio[13]));//efectivo alojamiento
+            pst.setDouble(23, Double.parseDouble(servicio[15]));//efectivo trf
+            pst.setDouble(24, Double.parseDouble(servicio[14]));// crédito alojamiento
+            pst.setDouble(25, Double.parseDouble(servicio[16]));//crédito trf
+            pst.setString(26, servicio[17]);//tarjetas crédito
+
+            pst.executeUpdate();
+            cn.close();
+
+            JOptionPane.showMessageDialog(null, "Servicio reservado correctamente");
+            Limpiar();
+
+        } catch (SQLException e) {
+            System.err.println("Error llenando tabla servicios: " + e);
+            JOptionPane.showMessageDialog(null, "Error llenando tabla servicios. Por favor contacte al administrador");
+        }
+    }
     
-    //comprobando si es número
-    public boolean EsDouble(String str) {
-        try {
-            double db = Double.parseDouble(str);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
+    private void Filtrar(){
+        int campo = jComboBox_campos.getSelectedIndex();
+        String abuscar = jTextField_buscar.getText().trim();
+        String query = "";
 
-    //comprobando si es entero
-    public boolean EsInt(String a) {
-        try {
-            int b = Integer.parseInt(a);
-        } catch (NumberFormatException e) {
-            return false;
+        if (campo == 0) {//buscar "Todos";            
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, Telefono_cell, E_mail, Observaciones "
+                    + "from Clientes";
+            jTextField_buscar.setText("");
+        } else if (campo == 1) {//buscar por "Nombre";            
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, "
+                    + "Telefono_cell, E_mail, Observaciones from Clientes where Nombre = '" + abuscar + "'";
+        } else if (campo == 2) {//buscar por "Telefono_fijo";            
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, "
+                    + "Telefono_cell, E_mail, Observaciones from Clientes where Telefono_fijo = '" + abuscar + "'";
+        } else if (campo == 3) {//buscar por "Telefono_cell";            
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, "
+                    + "Telefono_cell, E_mail, Observaciones from Clientes where Telefono_cell = '" + abuscar + "'";
+        } else if (campo == 4) {//buscar por "E_mail";            
+            query = "select Id_cliente, Nombre, Apellido, Nacionalidad, Telefono_fijo, "
+                    + "Telefono_cell, E_mail, Observaciones from Clientes where E_mail = '" + abuscar + "'";
         }
-        return true;
-    }
+        
+        Util.VaciarTabla(model);
 
+        try {//filtrando tabla clientes
+            Connection cn = Conexion.conectar();
+            PreparedStatement pst = cn.prepareStatement(query);
+
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                Object[] fila = new Object[8];
+
+                for (int i = 0; i < 8; i++) {
+                    fila[i] = rs.getObject(i + 1);
+                }
+                model.addRow(fila);
+            }
+            cn.close();
+
+        } catch (SQLException e) {
+            System.err.println("Error al filtrar tabla clientes: " + e);
+            JOptionPane.showMessageDialog(null, "!!Error al filtrar...comuníquese con el administrador");
+        }
+    }
 }

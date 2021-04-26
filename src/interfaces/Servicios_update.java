@@ -812,7 +812,7 @@ public class Servicios_update extends javax.swing.JFrame {
             System.err.println("Error accediendo a tabla servicios: " + e);
         }
         
-        if(historial_modificaciones == null){
+        if(historial_modificaciones == null || historial_modificaciones == ""){
             historial_modificaciones = "No se ha realizado ninguna modificación a esta reserva.";
         }
 
