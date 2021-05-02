@@ -36,7 +36,7 @@ import jxl.write.WriteException;
  * @author ALEX
  */
 public class Reporte_venta_diaria extends javax.swing.JDialog {
-    
+
     private String nombre, apellido;
     private DefaultTableModel model;
 
@@ -101,11 +101,11 @@ public class Reporte_venta_diaria extends javax.swing.JDialog {
         nombre_column[7] = "EFECTIVO";
         nombre_column[8] = "CREDITO";
         nombre_column[9] = "PROVEEDOR";
-        
+
         for (int i = 0; i < nombre_column.length; i++) {
             model.addColumn(nombre_column[i]);
-        }        
-        
+        }
+
 //        model.addColumn("TE");
 //        model.addColumn("EMISION");
 //        model.addColumn("EJECUCION");
@@ -115,9 +115,8 @@ public class Reporte_venta_diaria extends javax.swing.JDialog {
 //        model.addColumn("TOTAL");
 //        model.addColumn("EFECTIVO");
 //        model.addColumn("CREDITO");      
-        
         Filtrar();
-        
+
         int[] ancho = new int[10];
         ancho[0] = 100;//TE
         ancho[1] = 60;//EMISION
@@ -129,30 +128,11 @@ public class Reporte_venta_diaria extends javax.swing.JDialog {
         ancho[7] = 70;//EFECTIVO
         ancho[8] = 70;//CREDITO
         ancho[9] = 90;//PROVEEDOR
-        
+
         for (int i = 0; i < nombre_column.length; i++) {
             TableColumn columna = jTable_venta.getColumn(nombre_column[i]);
             Util.setAnchoColumna(columna, ancho[i]);
         }
-
-//        TableColumn columnaTE = jTable_venta.getColumn("TE");
-//        columnaTE.setPreferredWidth(30);
-//        TableColumn columnaEmision = jTable_venta.getColumn("EMISION");
-//        columnaEmision.setPreferredWidth(10);
-//        TableColumn columnaEjecucion = jTable_venta.getColumn("EJECUCION");
-//        columnaEjecucion.setPreferredWidth(40);
-//        TableColumn columnaPax = jTable_venta.getColumn("PAX");
-//        columnaPax.setPreferredWidth(30);
-//        TableColumn columnaNombre = jTable_venta.getColumn("NOMBRE");
-//        columnaNombre.setPreferredWidth(70);
-//        TableColumn columnaExcursion = jTable_venta.getColumn("EXCURSION");
-//        columnaExcursion.setPreferredWidth(80);
-//        TableColumn columnaTotal = jTable_venta.getColumn("TOTAL");
-//        columnaTotal.setPreferredWidth(20);
-//        TableColumn columnaEfectivo = jTable_venta.getColumn("EFECTIVO");
-//        columnaEfectivo.setPreferredWidth(20);
-//        TableColumn columnaCredito = jTable_venta.getColumn("CREDITO");
-//        columnaCredito.setPreferredWidth(20);
 
         TableRowSorter<TableModel> elQueOrdena = new TableRowSorter<TableModel>(model);
         jTable_venta.setRowSorter(elQueOrdena);
@@ -355,16 +335,15 @@ public class Reporte_venta_diaria extends javax.swing.JDialog {
     private javax.swing.JTable jTable_venta;
     // End of variables declaration//GEN-END:variables
 
-     public void Filtrar(){
+    public void Filtrar() {
         Date date = jDateChooser.getDate();
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
         String fecha = formato.format(date);
-        
+
 //        System.out.println("Fecha en método: " + fecha);
 //        System.out.println("Tabla en método rowCount: " + jTable_venta.getRowCount());
 //        System.out.println("Tabla en método columnCount: " + jTable_venta.getColumnCount());
 //        System.out.println("Usuario en método: " + Login.user);
-        
         try {
             Connection cn = Conexion.conectar();
             PreparedStatement pst = cn.prepareStatement("select TE_alojamiento, TE_traslado, Fecha_inicio, Fecha_fin, "
@@ -384,74 +363,88 @@ public class Reporte_venta_diaria extends javax.swing.JDialog {
                 String hotel = "", destino = "";
 
                 for (int i = 0; i < fila_rs.length; i++) {//llenando vector fila_rs con resultados del ResultSet
-                    fila_rs[i]= rs.getObject(i+1);
+                    fila_rs[i] = rs.getObject(i + 1);
                 }
-                
-//                for (int i = 0; i < fila_rs.length; i++) {
-//                    System.out.print("(" + fila_rs[i] + ")");
-//                }
-//                System.out.println("");
-//                System.out.println("----------------------------------------------------------------");
-                
+
                 if (!fila_rs[0].equals("")) {//llenando fila_aloj si TE_aloj diferente de ""
-                    fila_aloj[0] = fila_rs[0];
-                    fila_aloj[1] = fecha.substring(0, 5);
-                    fila_aloj[2] = String.valueOf(fila_rs[2]).substring(0, 5) + " al " + String.valueOf(fila_rs[3]).substring(0, 5);
-                    fila_aloj[3] = fila_rs[4].toString();
-                    if(!fila_rs[5].toString().equals("0")){
-                        fila_aloj[3] += " + " + fila_rs[5].toString();
+                    fila_aloj[0] = fila_rs[0];//TE aloj
+                    fila_aloj[1] = fecha.substring(0, 5);//emisión
+                    if (fila_rs[9].equals("CANCELADO")) {
+                        fila_aloj[2] = "";//ejecución
+                        fila_aloj[3] = "";//pax
+                        fila_aloj[4] = "";//nombre
+                        fila_aloj[5] = "CANCELADO";//Excursion (descripcion)
+                        fila_aloj[6] = "0,0";//total
+                        fila_aloj[7] = "0,0";//efectivo
+                        fila_aloj[8] = "0,0";//crédito
+                        fila_aloj[9] = "";//proveedor
+                    } else {
+                        fila_aloj[2] = String.valueOf(fila_rs[2]).substring(0, 5) + " al " + String.valueOf(fila_rs[3]).substring(0, 5);
+                        fila_aloj[3] = fila_rs[4].toString();
+                        if (!fila_rs[5].toString().equals("0")) {
+                            fila_aloj[3] += " + " + fila_rs[5].toString();
+                        }
+                        if (!fila_rs[6].toString().equals("0")) {
+                            fila_aloj[3] += " + " + fila_rs[6].toString() + " bb";
+                        }
+                        fila_aloj[4] = fila_rs[7] + " " + fila_rs[8];
+                        fila_aloj[5] = fila_rs[9] + " " + fila_rs[14];
+                        fila_aloj[6] = String.valueOf((double) fila_rs[10] + (double) fila_rs[11]).replace(".", ",");
+                        total_efectivo += (double) fila_rs[10];
+                        total_credito += (double) fila_rs[11];
+                        total_gral += (double) fila_rs[10] + (double) fila_rs[11];
+                        fila_aloj[7] = String.valueOf(fila_rs[10]).replace(".", ",");
+                        fila_aloj[8] = String.valueOf(fila_rs[11]).replace(".", ",");
+                        fila_aloj[9] = fila_rs[14];
                     }
-                    if(!fila_rs[6].toString().equals("0")){
-                        fila_aloj[3] += " + " + fila_rs[6].toString() + " bb";
-                    }
-                    fila_aloj[4] = fila_rs[7] + " " + fila_rs[8];
-                    fila_aloj[5] = fila_rs[9] + " " + fila_rs[14];
-                    fila_aloj[6] = String.valueOf((double)fila_rs[10] + (double)fila_rs[11]).replace(".", ",");
-                    total_efectivo += (double)fila_rs[10];
-                    total_credito += (double)fila_rs[11];
-                    total_gral += (double)fila_rs[10] + (double)fila_rs[11];
-                    fila_aloj[7] = String.valueOf(fila_rs[10]).replace(".", ",");
-                    fila_aloj[8] = String.valueOf(fila_rs[11]).replace(".", ",");
-                    fila_aloj[9] = fila_rs[14];
-                    model.addRow(fila_aloj);                    
+                    model.addRow(fila_aloj);
                 }
-                
+
                 if (!fila_rs[1].equals("")) {//llenando fila_trf si TE_trf diferente de ""
-                    fila_trf[0] = fila_rs[1];
-                    fila_trf[1] = fecha.substring(0, 5);
-                    fila_trf[2] = String.valueOf(fila_rs[2]).substring(0, 5) + " al " + String.valueOf(fila_rs[3]).substring(0, 5);
-                    fila_trf[3] = fila_rs[4].toString();
-                    if(!fila_rs[5].toString().equals("0")){
-                        fila_trf[3] += " + " + fila_rs[5].toString();
+                    fila_trf[0] = fila_rs[1];//TE trf
+                    fila_trf[1] = fecha.substring(0, 5);//emisión
+                    if (fila_rs[9].equals("CANCELADO")) {
+                        fila_trf[2] = "";//ejecución
+                        fila_trf[3] = "";//pax
+                        fila_trf[4] = "";//nombre
+                        fila_trf[5] = "CANCELADO";//Excursión (descripción)
+                        fila_trf[6] = "0,0";//total
+                        fila_trf[7] = "0,0";//efectivo
+                        fila_trf[8] = "0,0";//crédito
+                        fila_trf[9] = "";//proveedor
+                    } else {
+                        fila_trf[2] = String.valueOf(fila_rs[2]).substring(0, 5) + " al " + String.valueOf(fila_rs[3]).substring(0, 5);
+                        fila_trf[3] = fila_rs[4].toString();
+                        if (!fila_rs[5].toString().equals("0")) {
+                            fila_trf[3] += " + " + fila_rs[5].toString();
+                        }
+                        if (!fila_rs[6].toString().equals("0")) {
+                            fila_trf[3] += " + " + fila_rs[6].toString() + " bb";
+                        }
+                        fila_trf[4] = fila_rs[7] + " " + fila_rs[8];
+                        fila_trf[5] = "Traslado - " + fila_rs[15];
+                        fila_trf[6] = String.valueOf((double) fila_rs[12] + (double) fila_rs[13]).replace(".", ",");
+                        total_efectivo += (double) fila_rs[12];
+                        total_credito += (double) fila_rs[13];
+                        total_gral += (double) fila_rs[12] + (double) fila_rs[13];
+                        fila_trf[7] = String.valueOf(fila_rs[12]).replace(".", ",");
+                        fila_trf[8] = String.valueOf(fila_rs[13]).replace(".", ",");
+                        fila_trf[9] = fila_rs[16];
                     }
-                    if(!fila_rs[6].toString().equals("0")){
-                        fila_trf[3] += " + " + fila_rs[6].toString() + " bb";
-                    }
-                    fila_trf[4] = fila_rs[7] + " " + fila_rs[8];
-                    fila_trf[5] = "Traslado - " + fila_rs[15];
-                    fila_trf[6] = String.valueOf((double)fila_rs[12] + (double)fila_rs[13]).replace(".", ",");
-                    total_efectivo += (double)fila_rs[12];
-                    total_credito += (double)fila_rs[13];
-                    total_gral += (double)fila_rs[12] + (double)fila_rs[13];
-                    fila_trf[7] = String.valueOf(fila_rs[12]).replace(".",",");
-                    fila_trf[8] = String.valueOf(fila_rs[13]).replace(".",",");
-                    fila_trf[9] = fila_rs[16];
-                    model.addRow(fila_trf);                    
+                    model.addRow(fila_trf);
                 }
             }
-            
+
             Object[] fila = new Object[10];
             fila[0] = "Observaciones:";
             fila[6] = String.valueOf(total_gral).replace('.', ',');
             fila[7] = String.valueOf(total_efectivo).replace('.', ',');
             fila[8] = String.valueOf(total_credito).replace('.', ',');
             model.addRow(fila);
-            
             cn.close();
         } catch (SQLException e) {
             System.err.println("Error al llenar tabla. " + e);
             JOptionPane.showMessageDialog(null, "!!Error al mostrar tabla...contacte al administrador");
         }
-    }  
-    
+    }
 }

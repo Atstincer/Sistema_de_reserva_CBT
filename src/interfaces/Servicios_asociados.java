@@ -24,8 +24,8 @@ import javax.swing.table.TableColumn;
  * @author ALEX
  */
 public class Servicios_asociados extends javax.swing.JFrame {
-   
-    int Id_cliente;   
+
+    int Id_cliente;
     private DefaultTableModel mode1 = new DefaultTableModel();
 
     /**
@@ -38,19 +38,19 @@ public class Servicios_asociados extends javax.swing.JFrame {
         setTitle("Tabla servicios - " + Login.user);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        
-        Id_cliente = Clientes_update.Id_cliente;        
+
+        Id_cliente = Clientes_update.Id_cliente;
         String nombreCliente = "";
         String apellidoCliente = "";
-        
+
         try {
             Connection cn = Conexion.conectar();
             PreparedStatement pst = cn.prepareStatement("Select Nombre, Apellido from clientes where Id_cliente = '"
                     + "" + Id_cliente + "'");
-            
+
             ResultSet rs = pst.executeQuery();
-            
-            if(rs.next()){
+
+            if (rs.next()) {
                 nombreCliente = rs.getString("Nombre");
                 apellidoCliente = rs.getString("Apellido");
             }
@@ -58,57 +58,64 @@ public class Servicios_asociados extends javax.swing.JFrame {
         } catch (SQLException e) {
             System.err.println("Error conectando con BD tabla clientes: " + e);
         }
-        
+
         jLabel_encabezado.setText("Servicios asociados a: " + nombreCliente + " " + apellidoCliente);
-        
-       
+
+        jTable_servicios = new JTable(mode1);
+        jScrollPane1.setViewportView(jTable_servicios);
+
+        mode1.addColumn(" ");
+        mode1.addColumn("Descripción");
+        mode1.addColumn("TE alojamiento");
+        mode1.addColumn("Ad");
+        mode1.addColumn("Men");
+        mode1.addColumn("Inf");
+        mode1.addColumn("Hotel");
+        mode1.addColumn("Destino");
+        mode1.addColumn("Conf.");
+        mode1.addColumn("Desde");
+        mode1.addColumn("Hasta");
+        mode1.addColumn("Traslado?");
+        mode1.addColumn("TE traslado");
+        mode1.addColumn("Observaciones");
+
+        FijarAnchoColumnas();
+
         try {
             Connection cn = Conexion.conectar();
             PreparedStatement pst = cn.prepareStatement("select Id_servicio, Descripcion, TE_alojamiento, Pax, "
                     + "Menores, Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, "
-                    + "Observaciones from servicios where Id_cliente = '" + Id_cliente + "'");
-            
+                    + "Observaciones, CXX from servicios where Id_cliente = '" + Id_cliente + "'");
+
             ResultSet rs = pst.executeQuery();
-
-            jTable_servicios = new JTable(mode1);
-            jScrollPane1.setViewportView(jTable_servicios);
-
-            mode1.addColumn(" ");
-            mode1.addColumn("Descripción");
-            mode1.addColumn("TE alojamiento");
-            mode1.addColumn("Ad");
-            mode1.addColumn("Men");
-            mode1.addColumn("Inf");
-            mode1.addColumn("Hotel");            
-            mode1.addColumn("Destino");
-            mode1.addColumn("Conf.");
-            mode1.addColumn("Desde");
-            mode1.addColumn("Hasta");
-            mode1.addColumn("Traslado?");
-            mode1.addColumn("TE traslado");           
-            mode1.addColumn("Observaciones");
-            
-
-            FijarAnchoColumnas();
-
 
             while (rs.next()) {
                 Object[] fila = new Object[14];
-
-                for (int i = 0; i < 14; i++) {
-                    fila[i] = rs.getObject(i + 1);
+                String cxx = "";
+                for (int i = 0; i < 15; i++) {
+                    if(i<14){
+                        fila[i] = rs.getString(i + 1);
+                    }else{
+                        cxx = rs.getString(i+1);
+                    }                    
+                }
+                if(cxx.equals("SI")){
+                    fila[13] += "- CXX";
+                }else if(cxx.equals("SI_aloj")){
+                    fila[13] += "- CXX Hotel";
+                }else if(cxx.equals("SI_trf")){
+                    fila[13] += "- CXX TRF";
                 }
                 mode1.addRow(fila);
             }
             cn.close();
-
         } catch (SQLException e) {
             System.err.println("Error al llenar tabla. " + e);
-            JOptionPane.showMessageDialog(null, "!!Error al mostrar tabla...contacte al administrador");
+            JOptionPane.showMessageDialog(null, "!!Error: " + e.getMessage().toString());
         }
-        
-        Color myColorFondo = new Color(204,204,204);
-        Color myColorFuente = new Color(0,0,115);
+
+        Color myColorFondo = new Color(204, 204, 204);
+        Color myColorFuente = new Color(0, 0, 115);
         jTable_servicios.setBackground(myColorFondo);
         jTable_servicios.setForeground(myColorFuente);
 
@@ -242,7 +249,6 @@ public class Servicios_asociados extends javax.swing.JFrame {
     private javax.swing.JTable jTable_servicios;
     // End of variables declaration//GEN-END:variables
 
-   
     //método para fijar ancho columna Id
     public void FijarAnchoColumnas() {
         TableColumn columnaId = jTable_servicios.getColumn(" ");
@@ -257,7 +263,6 @@ public class Servicios_asociados extends javax.swing.JFrame {
         TableColumn columnaInf = jTable_servicios.getColumn("Inf");
         columnaInf.setMinWidth(30);
         columnaInf.setMaxWidth(30);
-    }  
-
+    }
 
 }

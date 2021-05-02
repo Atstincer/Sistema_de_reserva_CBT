@@ -153,6 +153,11 @@ public class Clientes_tablaFiltro extends javax.swing.JFrame {
 
         jComboBox_campos.setBackground(new java.awt.Color(100, 100, 100));
         jComboBox_campos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Todos", "Nombre", "Telefono_fijo", "Telefono_cell", "Email" }));
+        jComboBox_campos.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jComboBox_camposKeyPressed(evt);
+            }
+        });
         jPanel1.add(jComboBox_campos, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 40, 100, 30));
 
         jButton_agregar.setBackground(new java.awt.Color(153, 153, 153));
@@ -224,7 +229,7 @@ public class Clientes_tablaFiltro extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_buscarActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here:        
     }//GEN-LAST:event_jTextField_buscarActionPerformed
 
     private void jButton_agregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_agregarActionPerformed
@@ -252,6 +257,13 @@ public class Clientes_tablaFiltro extends javax.swing.JFrame {
             clientes_agregar.setVisible(true);
         }
     }//GEN-LAST:event_jButton_agregarKeyPressed
+
+    private void jComboBox_camposKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jComboBox_camposKeyPressed
+        // TODO add your handling code here:
+        if(evt.getExtendedKeyCode() == KeyEvent.VK_ENTER){
+            Filtrar();
+        }
+    }//GEN-LAST:event_jComboBox_camposKeyPressed
 
     /**
      * @param args the command line arguments

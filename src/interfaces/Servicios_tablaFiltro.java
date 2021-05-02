@@ -29,8 +29,8 @@ import javax.swing.table.TableColumn;
  */
 public class Servicios_tablaFiltro extends javax.swing.JFrame {
 
-    public static int Id_servicioSeleccionado;
-    DefaultTableModel mode1 = new DefaultTableModel();
+    private String id_servicio_seleccionado;
+    private DefaultTableModel mode1 = new DefaultTableModel();
 
     /**
      * Creates new form Clientes_AdminII
@@ -43,51 +43,32 @@ public class Servicios_tablaFiltro extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-        try {
-            Connection cn = Conexion.conectar();
-            PreparedStatement pst = cn.prepareStatement("select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, "
-                    + "Apellido_cliente, Pax, Menores, Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, "
-                    + "Traslado, TE_traslado, Observaciones from servicios");
+        jTable_servicios = new JTable(mode1);
+        jScrollPane1.setViewportView(jTable_servicios);
 
-            ResultSet rs = pst.executeQuery();
+        mode1.addColumn(" ");
+        mode1.addColumn("Descripción");
+        mode1.addColumn("TE alojamiento");
+        mode1.addColumn("Nombre");
+        mode1.addColumn("Apellido");
+        mode1.addColumn("Ad");
+        mode1.addColumn("Men");
+        mode1.addColumn("Inf");
+        mode1.addColumn("Hotel");
+        mode1.addColumn("Destino");
+        mode1.addColumn("Conf.");
+        mode1.addColumn("Desde");
+        mode1.addColumn("Hasta");
+        mode1.addColumn("Traslado?");
+        mode1.addColumn("TE traslado");
+        mode1.addColumn("Observaciones");
 
-            jTable_servicios = new JTable(mode1);
-            jScrollPane1.setViewportView(jTable_servicios);
-
-            mode1.addColumn(" ");
-            mode1.addColumn("Descripción");
-            mode1.addColumn("TE alojamiento");
-            mode1.addColumn("Nombre");
-            mode1.addColumn("Apellido");
-            mode1.addColumn("Ad");
-            mode1.addColumn("Men");
-            mode1.addColumn("Inf");
-            mode1.addColumn("Hotel");
-            mode1.addColumn("Destino");
-            mode1.addColumn("Conf.");
-            mode1.addColumn("Desde");
-            mode1.addColumn("Hasta");
-            mode1.addColumn("Traslado?");
-            mode1.addColumn("TE traslado");
-            mode1.addColumn("Observaciones");
-
-            FijarAnchoColumnas();
-
-            while (rs.next()) {
-                Object[] fila = new Object[16];
-
-                for (int i = 0; i < 16; i++) {
-                    fila[i] = rs.getObject(i + 1);
-                }
-                mode1.addRow(fila);
-            }
-            cn.close();
-
-        } catch (SQLException e) {
-            System.err.println("Error al llenar tabla. " + e);
-            JOptionPane.showMessageDialog(null, "!!Error al mostrar tabla...contacte al administrador");
-        }
-
+        FijarAnchoColumnas();
+        
+        jComboBox_campos.setSelectedIndex(0);
+        jTextField_buscar.setText("");
+        Filtrar();
+        
         Color myColorFondo = new Color(204, 204, 204);
         Color myColorFuente = new Color(0, 0, 115);
         jTable_servicios.setBackground(myColorFondo);
@@ -101,13 +82,10 @@ public class Servicios_tablaFiltro extends javax.swing.JFrame {
 //                int columna_point = 1;
 
                 if (fila_point > -1) {
-                    Id_servicioSeleccionado = (int) mode1.getValueAt(fila_point, 0);
-                    Servicios_update servicio_update = new Servicios_update();
-                    servicio_update.setVisible(true);
-
+                    id_servicio_seleccionado = mode1.getValueAt(fila_point, 0).toString();
+                    Seleccionar_cliente(id_servicio_seleccionado);
                 }
             }
-
         });
     }
 
@@ -163,6 +141,11 @@ public class Servicios_tablaFiltro extends javax.swing.JFrame {
 
         jComboBox_campos.setBackground(new java.awt.Color(100, 100, 100));
         jComboBox_campos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Todos", "TE_alojamiento", "TE_traslado", "Desde", "Hasta", "Fecha_reservado", "No_confirmacion" }));
+        jComboBox_campos.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jComboBox_camposKeyPressed(evt);
+            }
+        });
         jPanel1.add(jComboBox_campos, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 40, 140, 30));
 
         jButton_filtrar.setBackground(new java.awt.Color(153, 153, 153));
@@ -220,15 +203,22 @@ public class Servicios_tablaFiltro extends javax.swing.JFrame {
 
     private void jButton_filtrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_filtrarActionPerformed
         // TODO add your handling code here:
-       Filtrar();
+        Filtrar();
     }//GEN-LAST:event_jButton_filtrarActionPerformed
 
     private void jTextField_buscarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_buscarKeyPressed
         // TODO add your handling code here:
-        if(evt.getExtendedKeyCode()==KeyEvent.VK_ENTER){
+        if (evt.getExtendedKeyCode() == KeyEvent.VK_ENTER) {
             Filtrar();
         }
     }//GEN-LAST:event_jTextField_buscarKeyPressed
+
+    private void jComboBox_camposKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jComboBox_camposKeyPressed
+        // TODO add your handling code here:
+        if(evt.getExtendedKeyCode() == KeyEvent.VK_ENTER){
+            Filtrar();
+        }
+    }//GEN-LAST:event_jComboBox_camposKeyPressed
 
     /**
      * @param args the command line arguments
@@ -310,9 +300,9 @@ public class Servicios_tablaFiltro extends javax.swing.JFrame {
             return false;
         }
     }
-    
-    public void Filtrar(){
-         int campo = jComboBox_campos.getSelectedIndex();
+
+    public void Filtrar() {
+        int campo = jComboBox_campos.getSelectedIndex();
         String abuscar = jTextField_buscar.getText().trim();
         String query = "";
         int validar = 0;
@@ -320,7 +310,7 @@ public class Servicios_tablaFiltro extends javax.swing.JFrame {
         if (campo == 0) {//filtrar por todos            
             query = "select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, Apellido_cliente, Pax, Menores, "
                     + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
-                    + "from servicios";
+                    + "from servicios where Descripcion != 'CANCELADO' and CXX != 'SI'";
             jTextField_buscar.setText("");
             abuscar = "";
         } else {
@@ -328,41 +318,41 @@ public class Servicios_tablaFiltro extends javax.swing.JFrame {
                 if (campo == 1) {//filtrar por TE_alojamiento
                     query = "select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, Apellido_cliente, Pax, Menores, "
                             + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
-                            + "from servicios where TE_alojamiento = '" + abuscar + "'";
+                            + "from servicios where TE_alojamiento = '" + abuscar + "' and Descripcion != 'CANCELADO'";
                 } else if (campo == 2) {//filtrar por TE_traslado
                     query = "select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, Apellido_cliente, Pax, Menores, "
                             + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
-                            + "from servicios where TE_traslado = '" + abuscar + "'";
+                            + "from servicios where TE_traslado = '" + abuscar + "' and Descripcion != 'CANCELADO'";
                 } else if (campo == 3) {//filtrar por fecha_inicio
-                    if(ValidDate(abuscar)){
+                    if (ValidDate(abuscar)) {
                         query = "select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, Apellido_cliente, Pax, Menores, "
-                            + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
-                            + "from servicios where Fecha_inicio = '" + abuscar + "'";
+                                + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
+                                + "from servicios where Fecha_inicio = '" + abuscar + "' and CXX != 'SI'";
                     } else {
                         validar = 1;
                         JOptionPane.showMessageDialog(null, "Debes escribir la fecha a buscar con el formato "
                                 + "dia/mes/año" + "\n\n" + "Ejemplo: 05/01/2021");
-                    }                    
+                    }
                 } else if (campo == 4) {//filtrar por fecha_fin
-                    if(ValidDate(abuscar)){
+                    if (ValidDate(abuscar)) {
                         query = "select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, Apellido_cliente, Pax, Menores, "
-                            + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
-                            + "from servicios where Fecha_fin = '" + abuscar + "'";
+                                + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
+                                + "from servicios where Fecha_fin = '" + abuscar + "' and CXX != 'SI'";
                     } else {
                         validar = 1;
                         JOptionPane.showMessageDialog(null, "Debes escribir la fecha a buscar con el formato "
                                 + "dia/mes/año" + "\n\n" + "Ejemplo: 05/01/2021");
-                    }                        
+                    }
                 } else if (campo == 5) {//filtrar por fecha_reservado
-                    if(ValidDate(abuscar)){
+                    if (ValidDate(abuscar)) {
                         query = "select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, Apellido_cliente, Pax, Menores, "
-                            + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
-                            + "from servicios where Reservado_fecha = '" + abuscar + "'";
+                                + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
+                                + "from servicios where Reservado_fecha = '" + abuscar + "' and Descripcion != 'CANCELADO'";
                     } else {
                         validar = 1;
                         JOptionPane.showMessageDialog(null, "Debes escribir la fecha a buscar con el formato "
                                 + "dia/mes/año" + "\n\n" + "Ejemplo: 05/01/2021");
-                    }                       
+                    }
                 } else if (campo == 6) {//filtrar por No_confirmacion
                     query = "select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, Apellido_cliente, Pax, Menores, "
                             + "Infantes, Hotel, Destino, No_conf, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Observaciones "
@@ -376,11 +366,9 @@ public class Servicios_tablaFiltro extends javax.swing.JFrame {
 
         if (validar == 0) {
             VaciarTabla();
-
             try {
                 Connection cn2 = Conexion.conectar();
                 PreparedStatement pst = cn2.prepareStatement(query);
-
                 ResultSet rs = pst.executeQuery();
 
                 while (rs.next()) {
@@ -390,14 +378,20 @@ public class Servicios_tablaFiltro extends javax.swing.JFrame {
                         fila[i] = rs.getObject(i + 1);
                     }
                     mode1.addRow(fila);
-                }
+                }                
                 cn2.close();
-
             } catch (SQLException e) {
                 System.err.println("Error al filtrar: " + e);
                 JOptionPane.showMessageDialog(null, "!!Error al filtrar...comuníquese con el administrador");
             }
         }
+    }
+    
+    public void Seleccionar_cliente(String id_servicio){
+//        System.out.println("Dentro de Seleccionar_cliente() en JF: " + id_servicio);
+        Servicios_update servicio_update = new Servicios_update(this,true);        
+        servicio_update.Set_it_up(id_servicio);
+        servicio_update.setVisible(true);
     }
 
 }

@@ -857,12 +857,15 @@ public class Servicios_reservar extends javax.swing.JFrame {
     public String QueryVerificarCoincidenciaTE() {
         String query = "";
         if (!servicio[5].equals("") && servicio[7].equals("")) {//buscar por te_alojamiento
-            query = "select Id_servicio from Servicios where TE_alojamiento = '" + servicio[5] + "'";
+            query = "select Id_servicio from Servicios where TE_alojamiento = '" + servicio[5] + "'"
+                    + " or TE_traslado = '" + servicio[5] + "'";
         } else if (!servicio[5].equals("") && !servicio[7].equals("")) {//buscar por te_alojamiento y te_traslado
             query = "select Id_servicio from Servicios where TE_alojamiento = '" + servicio[5] + "' "
+                    + "or TE_alojamiento = '" + servicio[7] + "' or TE_traslado = '" + servicio[5] + "' "
                     + "or TE_traslado = '" + servicio[7] + "'";
         } else if (servicio[5].equals("") && !servicio[7].equals("")) {//buscar por te_traslado
-            query = "select Id_servicio from Servicios where TE_traslado = '" + servicio[7] + "'";
+            query = "select Id_servicio from Servicios where TE_traslado = '" + servicio[7] + "' or "
+                    + "TE_alojamiento = '" + servicio[7] + "'";
         }
         return query;
     }
@@ -931,18 +934,6 @@ public class Servicios_reservar extends javax.swing.JFrame {
         servicio[16] = jTextField_trf_credito.getText();
         servicio[17] = jTextArea1_tarjetas_credito.getText().toUpperCase();
         servicio[18] = jTextArea1_observacionesServicio.getText();
-
-//        Calendar calendar = Calendar.getInstance();
-//        String diaReservado = Integer.toString(calendar.get(Calendar.DATE));
-//        String mesReservado = Integer.toString(calendar.get(Calendar.MONTH) + 1);
-//        String anioReservado = Integer.toString(calendar.get(Calendar.YEAR));
-//        if(diaReservado.length() == 1){
-//            diaReservado = "0" + diaReservado;            
-//        }
-//        if(mesReservado.length() == 1){
-//            mesReservado = "0" + mesReservado;            
-//        }
-//        String fecha_reservado = diaReservado + "/" + mesReservado + "/" + anioReservado;
         servicio[19] = Util.getFecha_actual();
         servicio[20] = Login.user;
         servicio[21] = jTextField_nombreCliente.getText();
@@ -1033,7 +1024,7 @@ public class Servicios_reservar extends javax.swing.JFrame {
             jTextField_trf_efectivo.setText("");
             jTextField_trf_credito.setText("");
         } else {//TE trf - efectivo trf - credito trf
-            if (servicio[7].equals("") || (servicio[15].equals("0") && servicio[16].equals("0"))) {
+            if (servicio[7].equals("") || (servicio[15].equals("0") && servicio[16].equals("0")) || (servicio[15].equals("0.0") && servicio[16].equals("0.0"))) {
                 JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE traslado'\n"
                         + "y los valores de efectivo/crédito correspondientes.");
                 return false;
@@ -1049,19 +1040,20 @@ public class Servicios_reservar extends javax.swing.JFrame {
             jTextField_aloj_efectivo.setText("");
             jTextField_aloj_credito.setText("");
         } else {//TE alojamiento - efectivo Hotel - crédito Hotel
-            if (servicio[5].equals("") || (servicio[13].equals("0") && servicio[14].equals("0"))) {
+            if (servicio[5].equals("") || (servicio[13].equals("0") && servicio[14].equals("0")) || (servicio[13].equals("0.0") && servicio[14].equals("0.0"))) {
                 JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE_alojamiento'\n"
                         + "y los valores de efectivo/crédito correspondientes.");
                 return false;
             }
         }
 
-        if (!servicio[14].equals("0") || !servicio[16].equals("0")) {//validando campo tarjetas de crédito 
+        if ((!servicio[14].equals("0") && !servicio[14].equals("0.0")) || (!servicio[16].equals("0") && !servicio[16].equals("0.0"))) {//validando campo tarjetas de crédito 
             if (servicio[17].equals("")) {
                 JOptionPane.showMessageDialog(null, "Asegúrese de llenar el campo 'Tarjetas de crédito'.");
                 return false;
             }
         }
+        
         try {
             Connection cn = Conexion.conectar();
             //comprobando existencia de TE_alojamiento ó TE_traslado en BD
@@ -1070,7 +1062,7 @@ public class Servicios_reservar extends javax.swing.JFrame {
             ResultSet rs = pst.executeQuery();
 
             if (rs.next()) {
-                JOptionPane.showMessageDialog(null, "El ticket de alojamiento o de traslado coincide con los datos \\n"
+                JOptionPane.showMessageDialog(null, "El ticket de alojamiento o de traslado coincide con los datos \n"
                         + "de algún otro servicio reservado con anterioridad. Chequee por favor.");
                 return false;
             }
@@ -1108,7 +1100,7 @@ public class Servicios_reservar extends javax.swing.JFrame {
         try {//registrando datos en tabla servicio
             Connection cn = Conexion.conectar();
             PreparedStatement pst = cn.prepareStatement("insert into servicios values (?,?,?,?,?,?,?,"
-                    + "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                    + "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
             pst.setInt(1, 0);
             pst.setString(2, id_cliente);
@@ -1136,6 +1128,7 @@ public class Servicios_reservar extends javax.swing.JFrame {
             pst.setDouble(24, Double.parseDouble(servicio[14]));// crédito alojamiento
             pst.setDouble(25, Double.parseDouble(servicio[16]));//crédito trf
             pst.setString(26, servicio[17]);//tarjetas crédito
+            pst.setString(27,"NO");
 
             pst.executeUpdate();
             cn.close();

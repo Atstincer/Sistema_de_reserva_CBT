@@ -38,10 +38,10 @@ public class Reporte_venta_periodo extends javax.swing.JFrame {
         setTitle("Reporte de venta - " + Login.user);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        
-        Color colorJDateFondo = new Color(204,204,204);        
-        ((JTextField)jDateChooser_desde.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
-        ((JTextField)jDateChooser_hasta.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);  
+
+        Color colorJDateFondo = new Color(204, 204, 204);
+        ((JTextField) jDateChooser_desde.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
+        ((JTextField) jDateChooser_hasta.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
 
     }
 
@@ -124,90 +124,19 @@ public class Reporte_venta_periodo extends javax.swing.JFrame {
         // TODO add your handling code here:    
 
         Date desde = jDateChooser_desde.getDate();
-        Date hasta_date = jDateChooser_hasta.getDate();
+        Date hasta = jDateChooser_hasta.getDate();
 
-        if (desde == null || hasta_date == null) {
+        if (desde == null || hasta == null) {
             JOptionPane.showMessageDialog(null, "Debe selecionar las fechas que desea.");
         } else {
-            DateTimeFormatter formato_DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            DecimalFormat df = new DecimalFormat("#.00");
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
-            String desde_string = sdf.format(desde);
-//            System.out.println("desde_string: " + desde_string);
-            LocalDate dia_recorrido_LocalDate = LocalDate.parse(desde_string, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-//            System.out.println("Dia_recorrido_LocalDate: " + dia_recorrido_LocalDate);
-
-            String hasta_string = sdf.format(hasta_date);
-            LocalDate hasta_LocalDate = LocalDate.parse(hasta_string, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-//            System.out.println("Hasta_LocalDate: " + hasta_LocalDate);
-
-            double totalEfectivo = 0, totalCredito = 0;
-            String nombre = "", apellido = "";
-
-            try {
-                Connection cn = Conexion.conectar();
-                while (dia_recorrido_LocalDate.isBefore(hasta_LocalDate.plusDays(1))) {
-                    PreparedStatement pst = cn.prepareStatement("select Efectivo_hotel, Efectivo_trf, Credito_hotel, Credito_trf "
-                            + "from servicios where Reservado_fecha = '" + dia_recorrido_LocalDate.format(formato_DTF) + "' "
-                            + "and Reservado_por = '" + Login.user + "'");
-
-                    ResultSet rs = pst.executeQuery();
-
-                    while (rs.next()) {
-                        totalEfectivo += rs.getDouble("Efectivo_hotel");
-                        totalEfectivo += rs.getDouble("Efectivo_trf");
-                        totalCredito += rs.getDouble("Credito_hotel");
-                        totalCredito += rs.getDouble("Credito_trf");
-                    }
-
-//                    System.out.println(dia_recorrido_LocalDate);
-                    dia_recorrido_LocalDate = dia_recorrido_LocalDate.plusDays(1);
-                }
-
-                PreparedStatement pst = cn.prepareStatement("select Nombre, Apellido from usuarios where Usuario = '"
-                        + "" + Login.user + "'");
-
-                ResultSet rs = pst.executeQuery();
-
-                if (rs.next()) {
-                    nombre = rs.getString("Nombre");
-                    apellido = rs.getString("Apellido");
-                }
-                cn.close();
-            } catch (SQLException e) {
-            }
-
-        String totalEfectivo_string = "";
-        String totalCredito_string = "";
-        String total_string = "";
-        
-        if (totalEfectivo == 0) {
-            totalEfectivo_string = "0,00";
-        } else {
-            totalEfectivo_string = df.format(totalEfectivo);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");            
+            String desde_str = sdf.format(desde);
+            String hasta_str = sdf.format(hasta);
+            LocalDate desde_LD = LocalDate.parse(desde_str,DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDate hasta_LD = LocalDate.parse(hasta_str,DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            
+            getVenta(desde_LD, hasta_LD);
         }
-        
-        if (totalCredito == 0) {
-            totalCredito_string = "0,00";
-        } else {
-            totalCredito_string = df.format(totalCredito);
-        }
-        
-        if ((totalEfectivo + totalCredito) == 0) {
-            total_string = "0,00";
-        } else {
-            total_string = df.format(totalEfectivo + totalCredito);
-        }
-
-            JOptionPane.showMessageDialog(null, "Venta de " + nombre + " " + apellido + " desde " + desde_string + " "
-                    + "hasta " + hasta_string + "\n\n"
-                    + "-en efectivo: " + totalEfectivo_string + "\n" + ""
-                    + "-en tarjeta de crédito: " + totalCredito_string + "\n" + ""
-                    + "-para un total de: " + total_string, "VENTA SEGUN PERIODO - " + Login.user, ICONIFIED);
-        }
-
-
     }//GEN-LAST:event_jButton_calcularActionPerformed
 
     /**
@@ -258,4 +187,108 @@ public class Reporte_venta_periodo extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel_footer;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
+
+    public static void getVenta(LocalDate dia_recorrido_LD, LocalDate hasta_LD) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DecimalFormat df = new DecimalFormat("#.00");
+//        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        String desde_str = dia_recorrido_LD.format(dtf);
+////            System.out.println("desde_string: " + desde_string);
+//        LocalDate dia_recorrido_LD = LocalDate.parse(desde_str, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+////            System.out.println("Dia_recorrido_LocalDate: " + dia_recorrido_LocalDate);
+//
+//        String hasta_str = hasta_LD.format(dtf);
+//        LocalDate hasta_LD = LocalDate.parse(hasta_str, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+//            System.out.println("Hasta_LocalDate: " + hasta_LocalDate);
+
+        double totalEfectivo = 0, totalCredito = 0, total_cxx = 0;
+        String nombre = "", apellido = "", cxx = "";
+
+        try {
+            Connection cn = Conexion.conectar();
+            while (dia_recorrido_LD.isBefore(hasta_LD.plusDays(1))) {
+                PreparedStatement pst = cn.prepareStatement("select Efectivo_hotel, Efectivo_trf, Credito_hotel, "
+                        + "Credito_trf, CXX from servicios where Reservado_fecha = '"
+                        + "" + dia_recorrido_LD.format(dtf) + "' and Reservado_por = '"
+                        + "" + Login.user + "'");
+
+                ResultSet rs = pst.executeQuery();
+
+                while (rs.next()) {
+                    cxx = rs.getString("CXX");
+                    if (cxx.equals("NO")) {
+                        totalEfectivo += rs.getDouble("Efectivo_hotel");
+                        totalEfectivo += rs.getDouble("Efectivo_trf");
+                        totalCredito += rs.getDouble("Credito_hotel");
+                        totalCredito += rs.getDouble("Credito_trf");
+                    } else if (cxx.equals("SI_aloj")) {
+                        totalEfectivo += rs.getDouble("Efectivo_trf");
+                        totalCredito += rs.getDouble("Credito_trf");
+                        total_cxx += rs.getDouble("Efectivo_hotel");
+                        total_cxx += rs.getDouble("Credito_hotel");
+                    } else if (cxx.equals("SI_trf")) {
+                        totalEfectivo += rs.getDouble("Efectivo_hotel");
+                        totalCredito += rs.getDouble("Credito_hotel");
+                        total_cxx += rs.getDouble("Efectivo_trf");
+                        total_cxx += rs.getDouble("Credito_trf");
+                    } else if (cxx.equals("SI")) {
+                        total_cxx += rs.getDouble("Efectivo_hotel");
+                        total_cxx += rs.getDouble("Efectivo_trf");
+                        total_cxx += rs.getDouble("Credito_hotel");
+                        total_cxx += rs.getDouble("Credito_trf");
+                    }
+                }
+
+//                    System.out.println(dia_recorrido_LocalDate);
+                dia_recorrido_LD = dia_recorrido_LD.plusDays(1);
+            }
+
+            PreparedStatement pst = cn.prepareStatement("select Nombre, Apellido from usuarios where Usuario = '"
+                    + "" + Login.user + "'");
+
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                nombre = rs.getString("Nombre");
+                apellido = rs.getString("Apellido");
+            }
+            cn.close();
+        } catch (SQLException e) {
+        }
+
+        String totalEfectivo_string = "", totalCredito_string = "", total_string = "";
+        String total_cxx_str = "";
+
+        if (totalEfectivo == 0) {
+            totalEfectivo_string = "0,00";
+        } else {
+            totalEfectivo_string = df.format(totalEfectivo);
+        }
+
+        if (totalCredito == 0) {
+            totalCredito_string = "0,00";
+        } else {
+            totalCredito_string = df.format(totalCredito);
+        }
+
+        if ((totalEfectivo + totalCredito) == 0) {
+            total_string = "0,00";
+        } else {
+            total_string = df.format(totalEfectivo + totalCredito);
+        }
+
+        if (total_cxx == 0) {
+            total_cxx_str = "0,00";
+        } else {
+            total_cxx_str = df.format(total_cxx);
+        }
+
+        JOptionPane.showMessageDialog(null, "Venta de " + nombre + " " + apellido + " desde " + desde_str + " "
+                + "hasta " + hasta_LD.format(dtf) + "\n\n"
+                + "-en efectivo: " + totalEfectivo_string + "\n" + ""
+                + "-en tarjeta de crédito: " + totalCredito_string + "\n" + ""
+                + "-para un total de: " + total_string + "\n\n"
+                + "Con un total cancelados: " + total_cxx_str, "VENTA SEGUN PERIODO - " + Login.user, ICONIFIED);
+    }
 }

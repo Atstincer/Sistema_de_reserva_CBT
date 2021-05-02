@@ -61,6 +61,10 @@ public class Admin extends javax.swing.JFrame {
         jMenu_serv = new javax.swing.JMenu();
         jMenuItem_reservarServ = new javax.swing.JMenuItem();
         jMenuItem_filtroServ = new javax.swing.JMenuItem();
+        jMenu6 = new javax.swing.JMenu();
+        jMenuItem_cancelar = new javax.swing.JMenuItem();
+        jMenuItem_cxx_tabla = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
         jMenuItem_clientes = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
@@ -119,7 +123,7 @@ public class Admin extends javax.swing.JFrame {
         });
         jMenu_serv.add(jMenuItem_reservarServ);
 
-        jMenuItem_filtroServ.setText("Consulta - Modificar/Actualizar");
+        jMenuItem_filtroServ.setText("Tabla");
         jMenuItem_filtroServ.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem_filtroServActionPerformed(evt);
@@ -127,15 +131,39 @@ public class Admin extends javax.swing.JFrame {
         });
         jMenu_serv.add(jMenuItem_filtroServ);
 
-        jMenuItem_clientes.setText("Clientes");
+        jMenu6.setText("Cancelados");
+
+        jMenuItem_cancelar.setText("Cancelar");
+        jMenuItem_cancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_cancelarActionPerformed(evt);
+            }
+        });
+        jMenu6.add(jMenuItem_cancelar);
+
+        jMenuItem_cxx_tabla.setText("Tabla");
+        jMenuItem_cxx_tabla.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_cxx_tablaActionPerformed(evt);
+            }
+        });
+        jMenu6.add(jMenuItem_cxx_tabla);
+
+        jMenu_serv.add(jMenu6);
+
+        jMenuBar1.add(jMenu_serv);
+
+        jMenu5.setText("Clientes");
+
+        jMenuItem_clientes.setText("Tabla");
         jMenuItem_clientes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem_clientesActionPerformed(evt);
             }
         });
-        jMenu_serv.add(jMenuItem_clientes);
+        jMenu5.add(jMenuItem_clientes);
 
-        jMenuBar1.add(jMenu_serv);
+        jMenuBar1.add(jMenu5);
 
         jMenu1.setText("Reportes");
 
@@ -149,7 +177,7 @@ public class Admin extends javax.swing.JFrame {
         });
         jMenu3.add(jMenuItem_paraTransportistas);
 
-        jMenuItem_origen_hora_trf.setText("Editar origen/hora traslados");
+        jMenuItem_origen_hora_trf.setText("Editar origen/hora");
         jMenuItem_origen_hora_trf.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem_origen_hora_trfActionPerformed(evt);
@@ -279,74 +307,8 @@ public class Admin extends javax.swing.JFrame {
         // TODO add your handling code here:
         LocalDate hoy = LocalDate.now();
         LocalDate dia_recorrido = hoy.with(TemporalAdjusters.firstDayOfMonth());
-
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DecimalFormat df = new DecimalFormat("#.00");
-
-        double totalEfectivo = 0, totalCredito = 0;
-        String nombre = "", apellido = "";
-
-        try {
-            Connection cn = Conexion.conectar();
-            while (dia_recorrido.isBefore(hoy.plusDays(1))) {
-                PreparedStatement pst = cn.prepareStatement("select Efectivo_hotel, Efectivo_trf, Credito_hotel, Credito_trf "
-                        + "from servicios where Reservado_fecha = '" + dia_recorrido.format(formato) + "' and Reservado_por = '"
-                        + "" + Login.user + "'");
-
-                ResultSet rs = pst.executeQuery();
-
-                while (rs.next()) {
-                    totalEfectivo += rs.getDouble("Efectivo_hotel");
-                    totalEfectivo += rs.getDouble("Efectivo_trf");
-                    totalCredito += rs.getDouble("Credito_hotel");
-                    totalCredito += rs.getDouble("Credito_trf");
-                }
-
-//                System.out.println(dia);
-                dia_recorrido = dia_recorrido.plusDays(1);                
-            }
-
-            PreparedStatement pst = cn.prepareStatement("select Nombre, Apellido from usuarios where Usuario = '"
-                    + "" + Login.user + "'");
-
-            ResultSet rs = pst.executeQuery();
-
-            if (rs.next()) {
-                nombre = rs.getString("Nombre");
-                apellido = rs.getString("Apellido");
-            }
-            cn.close();
-        } catch (SQLException e) {
-        }
         
-        String totalEfectivo_string = "";
-        String totalCredito_string = "";
-        String total_string = "";
-        
-        if (totalEfectivo == 0) {
-            totalEfectivo_string = "0,00";
-        } else {
-            totalEfectivo_string = df.format(totalEfectivo);
-        }
-        
-        if (totalCredito == 0) {
-            totalCredito_string = "0,00";
-        } else {
-            totalCredito_string = df.format(totalCredito);
-        }
-        
-        if ((totalEfectivo + totalCredito) == 0) {
-            total_string = "0,00";
-        } else {
-            total_string = df.format(totalEfectivo + totalCredito);
-        }
-        
-        JOptionPane.showMessageDialog(null, "Venta de " + nombre + " " + apellido + " en lo que va de mes hasta hoy "
-                + "" + hoy.format(formato) + "\n\n" + ""
-                + "-en efectivo: " + totalEfectivo_string + "\n" + ""
-                + "-en tarjeta de crédito: " + totalCredito_string + "\n" + ""
-                + "-para un total de: " + total_string, "VENTA MES ACTUAL - " + Login.user, ICONIFIED);        
-     
+        Reporte_venta_periodo.getVenta(dia_recorrido, hoy);    
 
     }//GEN-LAST:event_jMenuItem_Venta_mes_actualActionPerformed
 
@@ -354,73 +316,8 @@ public class Admin extends javax.swing.JFrame {
         // TODO add your handling code here:
         LocalDate hoy = LocalDate.now();
         LocalDate dia_recorrido = hoy.with(TemporalAdjusters.firstDayOfYear());
-
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DecimalFormat df = new DecimalFormat("#.00");
-
-        double totalEfectivo = 0, totalCredito = 0;
-        String nombre = "", apellido = "";
-
-        try {
-            Connection cn = Conexion.conectar();
-            while (dia_recorrido.isBefore(hoy.plusDays(1))) {
-                PreparedStatement pst = cn.prepareStatement("select Efectivo_hotel, Efectivo_trf, Credito_hotel, Credito_trf "
-                        + "from servicios where Reservado_fecha = '" + dia_recorrido.format(formato) + "' and Reservado_por = '"
-                        + "" + Login.user + "'");
-
-                ResultSet rs = pst.executeQuery();
-
-                while (rs.next()) {
-                    totalEfectivo += rs.getDouble("Efectivo_hotel");
-                    totalEfectivo += rs.getDouble("Efectivo_trf");
-                    totalCredito += rs.getDouble("Credito_hotel");
-                    totalCredito += rs.getDouble("Credito_trf");
-                }
-
-//                System.out.println(dia);
-                dia_recorrido = dia_recorrido.plusDays(1);                
-            }
-
-            PreparedStatement pst = cn.prepareStatement("select Nombre, Apellido from usuarios where Usuario = '"
-                    + "" + Login.user + "'");
-
-            ResultSet rs = pst.executeQuery();
-
-            if (rs.next()) {
-                nombre = rs.getString("Nombre");
-                apellido = rs.getString("Apellido");
-            }
-            cn.close();
-        } catch (SQLException e) {
-        }
         
-        String totalEfectivo_string = "";
-        String totalCredito_string = "";
-        String total_string = "";
-        
-        if (totalEfectivo == 0) {
-            totalEfectivo_string = "0,00";
-        } else {
-            totalEfectivo_string = df.format(totalEfectivo);
-        }
-        
-        if (totalCredito == 0) {
-            totalCredito_string = "0,00";
-        } else {
-            totalCredito_string = df.format(totalCredito);
-        }
-        
-        if ((totalEfectivo + totalCredito) == 0) {
-            total_string = "0,00";
-        } else {
-            total_string = df.format(totalEfectivo + totalCredito);
-        }
-        
-        JOptionPane.showMessageDialog(null, "Venta de " + nombre + " " + apellido + " en lo que va de año hasta hoy "
-                + "" + hoy.format(formato) + "\n\n" + ""
-                + "-en efectivo: " + totalEfectivo_string + "\n" + ""
-                + "-en tarjeta de crédito: " + totalCredito_string + "\n" + ""
-                + "-para un total de: " + total_string, "VENTA DEL AÑO - " + Login.user, ICONIFIED); 
+        Reporte_venta_periodo.getVenta(dia_recorrido, hoy);
         
     }//GEN-LAST:event_jMenuItem_Venta_Anio_hasta_actualidadActionPerformed
 
@@ -446,6 +343,18 @@ public class Admin extends javax.swing.JFrame {
         Reporte_venta_diaria reporte = new Reporte_venta_diaria(this, true);
         reporte.setVisible(true);
     }//GEN-LAST:event_jMenuItem_reporte_VentaActionPerformed
+
+    private void jMenuItem_cancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_cancelarActionPerformed
+        // TODO add your handling code here:
+        Cancelar cxx = new Cancelar(this,true);
+        cxx.setVisible(true);
+    }//GEN-LAST:event_jMenuItem_cancelarActionPerformed
+
+    private void jMenuItem_cxx_tablaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_cxx_tablaActionPerformed
+        // TODO add your handling code here:
+        Cancelados_tabla cxx = new Cancelados_tabla(this,true);
+        cxx.setVisible(true);
+    }//GEN-LAST:event_jMenuItem_cxx_tablaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -492,11 +401,15 @@ public class Admin extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem_Venta_Anio_hasta_actualidad;
     private javax.swing.JMenuItem jMenuItem_Venta_mes_actual;
     private javax.swing.JMenuItem jMenuItem_Venta_segun_periodo;
+    private javax.swing.JMenuItem jMenuItem_cancelar;
     private javax.swing.JMenuItem jMenuItem_clientes;
+    private javax.swing.JMenuItem jMenuItem_cxx_tabla;
     private javax.swing.JMenuItem jMenuItem_filtroServ;
     private javax.swing.JMenuItem jMenuItem_hotel_sin_confirmar;
     private javax.swing.JMenuItem jMenuItem_liquidacion;

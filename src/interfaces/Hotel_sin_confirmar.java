@@ -25,11 +25,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -90,104 +94,15 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
         filtrar();
 
         jTable_servicios_no_confirmados.addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseClicked(MouseEvent e) {
                 int fila_point = jTable_servicios_no_confirmados.rowAtPoint(e.getPoint());
 //                int columna_point = 1;
-
                 if (fila_point > -1) {
                     Id_servicioSeleccionado = (int) model.getValueAt(fila_point, 0);
-
-                    String Id_cliente = "", desde = "", hasta = "", nombre = "", apellido = "";
-
-                    try {//descargando datos del servicio
-                        Connection cn = Conexion.conectar();
-                        PreparedStatement pst = cn.prepareStatement("select Id_cliente, Descripcion, TE_alojamiento, Hotel, Destino, "
-                                + "Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Reservado_fecha, Reservado_por, Observaciones, "
-                                + "Proveedor_trf, No_conf, Pax, Nombre_cliente, Menores, Infantes, Apellido_cliente, Efectivo_hotel, "
-                                + "Efectivo_trf, Credito_hotel, Credito_trf, Tarjeta_credito from servicios where Id_servicio = '"
-                                + "" + Id_servicioSeleccionado + "'");
-
-                        ResultSet rs = pst.executeQuery();
-
-                        if (rs.next()) {
-                            Id_cliente = rs.getString("Id_cliente");
-                            jTextField_descripcionServ.setText(rs.getString("Descripcion"));
-                            jTextField_TEaloj.setText(rs.getString("TE_alojamiento"));
-                            jTextField_hotel.setText(rs.getString("Hotel"));
-                            jComboBox_destino.setSelectedItem(rs.getString("Destino"));
-                            desde = rs.getString("Fecha_inicio");
-                            hasta = rs.getString("Fecha_fin");
-                            jComboBox_trf.setSelectedItem(rs.getString("Traslado"));
-                            jTextField_TEtrf.setText(rs.getString("TE_traslado"));
-                            jTextField_reservadoFecha.setText(rs.getString("Reservado_fecha"));
-                            jTextField_reservadoPor.setText(rs.getString("Reservado_por"));
-                            jTextArea1_observacionesServicio.setText(rs.getString("Observaciones"));
-                            jComboBox_proveedorTRF.setSelectedItem(rs.getString("Proveedor_trf"));
-                            jTextField_confirmacion.setText(rs.getString("No_conf"));
-                            jTextField_pax.setText(rs.getString("Pax"));
-                            nombre = rs.getString("Nombre_cliente");
-                            jTextField_menor.setText(rs.getString("Menores"));
-                            jTextField_infante.setText(rs.getString("Infantes"));
-                            apellido = rs.getString("Apellido_cliente");
-                            jTextField_aloj_efectivo.setText(String.valueOf(rs.getDouble("Efectivo_hotel")));
-                            jTextField_trf_efectivo.setText(String.valueOf(rs.getDouble("Efectivo_trf")));
-                            jTextField_aloj_credito.setText(String.valueOf(rs.getDouble("Credito_hotel")));
-                            jTextField_trf_credito.setText(String.valueOf(rs.getDouble("Credito_trf")));
-                            jTextArea1_tarjetas_credito.setText(rs.getString("Tarjeta_credito"));
-                        }
-                        cn.close();
-                    } catch (SQLException ev) {
-                        System.err.println("Error al intentar obtener datos del servicio: " + ev);
-                        JOptionPane.showMessageDialog(null, "Error al conectarse con la BD. Contacte al administrador.");
-                    }
-
-                    try {//colocando fechas en jdatechooser
-                        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-                        Date fecha_desde = formato.parse(desde);
-                        Date fecha_hasta = formato.parse(hasta);
-                        jDateChooser_fechaIda.setDate(fecha_desde);
-                        jDateChooser_fechaRegreso.setDate(fecha_hasta);
-                    } catch (ParseException ev) {
-                        System.err.println("Error parseando fecha: " + ev);
-                    }
-
-                    if (!Id_cliente.equals("")) {//llenando datos cliente vinculado al servicio
-                        try {
-                            Connection cn1 = Conexion.conectar();
-                            PreparedStatement pst1 = cn1.prepareStatement("select Nombre, Apellido, Nacionalidad, Telefono_fijo, "
-                                    + "Telefono_cell, E_mail, Observaciones from clientes where Id_cliente = '" + Id_cliente + "'");
-
-                            ResultSet rs1 = pst1.executeQuery();
-
-                            if (rs1.next()) {
-                                jTextField_nombreCliente.setText(rs1.getString("Nombre"));
-                                jTextField_apellidoCliente.setText(rs1.getString("Apellido"));
-                                jTextField_nacionalidadCliente.setText(rs1.getString("Nacionalidad"));
-                                jTextField_telefonoCliente.setText(rs1.getString("Telefono_fijo"));
-                                jTextField_celularCliente.setText(rs1.getString("Telefono_cell"));
-                                jTextField_EmailCliente.setText(rs1.getString("E_mail"));
-                                jTextArea1_observacionesCliente.setText(rs1.getString("Observaciones"));
-
-                                cn1.close();
-                            } else {
-                                jTextField_nombreCliente.setText(nombre);
-                                jTextField_apellidoCliente.setText(apellido);
-                            }
-                        } catch (SQLException ev) {
-                            System.err.println("Error accediendo tabla clientes en constructor: " + ev);
-                            JOptionPane.showMessageDialog(null, "!!Error conectando con BD. Contacte al administrador.");
-                        }
-                    } else {
-                        jTextField_nombreCliente.setText(nombre);
-                        jTextField_apellidoCliente.setText(apellido);
-                    }
-                    
-                    jDialog_Servicio_actualizar.setVisible(true);                    
+                    setUp_JD();
                 }
             }
-
         });
     }
 
@@ -274,6 +189,7 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
         jTextField_trf_efectivo = new javax.swing.JTextField();
         jTextField_trf_credito = new javax.swing.JTextField();
         jLabel36 = new javax.swing.JLabel();
+        jLabel_CXX = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextField_days_ahead = new javax.swing.JTextField();
@@ -310,6 +226,7 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
         jLabel7.setText("Descripción");
         jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
 
+        jTextField_descripcionServ.setEditable(false);
         jTextField_descripcionServ.setBackground(new java.awt.Color(204, 204, 204));
         jTextField_descripcionServ.setForeground(new java.awt.Color(0, 0, 115));
         jTextField_descripcionServ.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 5, 1, 1));
@@ -318,6 +235,7 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
         jLabel8.setText("Hotel");
         jPanel2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(205, 90, -1, -1));
 
+        jTextField_hotel.setEditable(false);
         jTextField_hotel.setBackground(new java.awt.Color(204, 204, 204));
         jTextField_hotel.setForeground(new java.awt.Color(0, 0, 115));
         jTextField_hotel.setAutoscrolls(false);
@@ -626,6 +544,9 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
         jLabel36.setText("Traslado");
         jPanel2.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 285, -1, -1));
 
+        jLabel_CXX.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jPanel2.add(jLabel_CXX, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 20, -1, 50));
+
         javax.swing.GroupLayout jDialog_Servicio_actualizarLayout = new javax.swing.GroupLayout(jDialog_Servicio_actualizar.getContentPane());
         jDialog_Servicio_actualizar.getContentPane().setLayout(jDialog_Servicio_actualizarLayout);
         jDialog_Servicio_actualizarLayout.setHorizontalGroup(
@@ -794,62 +715,44 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
 
     private void jButton_actualizarServActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_actualizarServActionPerformed
         // TODO add your handling code here:
-        String descripcion = jTextField_descripcionServ.getText();
-        String hotel = jTextField_hotel.getText();
         String confirmacion = jTextField_confirmacion.getText().toUpperCase();
-        Calendar calendar = Calendar.getInstance();
-        int dia = calendar.get(Calendar.DATE);
-        int mes = calendar.get(Calendar.MONTH) + 1;
-        int anio = calendar.get(Calendar.YEAR);
-        String fechaModificado = dia + "/" + mes + "/" + anio;
-        int validarServ = 0;
+        String fechaModificado = Util.getFecha_actual();
+        String historial_modificaciones = "";
 
-        //validando campos info servicio
-        if (descripcion.equals("")) {
-            JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'Descripcion'.");
-            validarServ = 1;
-        }
+        try {
+            Connection cn = Conexion.conectar();
+            PreparedStatement pst = cn.prepareStatement("select Historial_modificaciones from servicios where "
+                    + "Id_servicio = '" + Id_servicioSeleccionado + "'");
 
-        if (validarServ == 0) {//actualizando BD tabla Servicios
+            ResultSet rs = pst.executeQuery();
 
-            String historial_modificaciones = "";
-
-            try {
-                Connection cn = Conexion.conectar();
-                PreparedStatement pst = cn.prepareStatement("select Historial_modificaciones from servicios where "
-                        + "Id_servicio = '" + Id_servicioSeleccionado + "'");
-
-                ResultSet rs = pst.executeQuery();
-
-                if (rs.next()) {
-                    historial_modificaciones = rs.getString("Historial_modificaciones");
-                }
-
-                if (historial_modificaciones == null) {
-                    historial_modificaciones = "";
-                }
-                historial_modificaciones += fechaModificado + " - " + Login.user + "\n";
-
-                pst = cn.prepareStatement("update Servicios set Descripcion=?, Hotel=?, No_conf=?, "
-                        + "Historial_modificaciones=? where Id_servicio = '" + Id_servicioSeleccionado + "'");
-
-                pst.setString(1, descripcion);
-                pst.setString(2, hotel);
-                pst.setString(3, confirmacion);
-                pst.setString(4, historial_modificaciones);
-                
-                pst.executeUpdate();
-
-                cn.close();
-                JOptionPane.showMessageDialog(null, "Información del servicio actualizada correctamente.");
-                jDialog_Servicio_actualizar.dispose();
-                filtrar();
-            } catch (SQLException e) {
-                System.err.println("Error al registrar datos en tabla servicios: " + e);
-                JOptionPane.showMessageDialog(null, "!!Error al registrar datos en la BD. Contacte al administrador.");
+            if (rs.next()) {
+                historial_modificaciones = rs.getString("Historial_modificaciones");
+            } else {
+                historial_modificaciones = "";
             }
 
+            if (historial_modificaciones == null) {
+                historial_modificaciones = "";
+            }
+            historial_modificaciones += fechaModificado + " - " + Login.user + "\n";
+
+            pst = cn.prepareStatement("update Servicios set No_conf=?, Historial_modificaciones=? where "
+                    + "Id_servicio = '" + Id_servicioSeleccionado + "'");
+
+            pst.setString(1, confirmacion);
+            pst.setString(2, historial_modificaciones);
+            pst.executeUpdate();
+            cn.close();
+            JOptionPane.showMessageDialog(null, "Información del servicio actualizada correctamente.");
+            jDialog_Servicio_actualizar.dispose();
+            filtrar();
+        } catch (SQLException e) {
+            System.err.println("Error al registrar datos en tabla servicios: " + e);
+            JOptionPane.showMessageDialog(null, "!!Error al registrar datos en la BD. Contacte al administrador.");
         }
+
+
     }//GEN-LAST:event_jButton_actualizarServActionPerformed
 
     private void jTextField_reservadoPorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_reservadoPorActionPerformed
@@ -976,6 +879,7 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabel_CXX;
     private javax.swing.JLabel jLabel_footer;
     private javax.swing.JLabel jLabel_footer1;
     private javax.swing.JPanel jPanel1;
@@ -1032,7 +936,7 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
         Util.VaciarTabla(model);
 
         int days = 0;
-        if (Util.EsInt(jTextField_days_ahead.getText()) && Util.IsEmpty(jTextField_days_ahead.getText()) == false) {
+        if (Util.EsInt(jTextField_days_ahead.getText()) && !Util.IsEmpty(jTextField_days_ahead.getText())) {
             days = Integer.parseInt(jTextField_days_ahead.getText());
         } else {
             JOptionPane.showMessageDialog(null, "Debes especificar los 'días en adelante' correctamente.");
@@ -1047,19 +951,20 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
         if (jCheckBox_incluir_noHotel.isSelected()) {
             query = "select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, "
                     + "Apellido_cliente, Pax, Menores, Infantes, Hotel, No_conf, Fecha_inicio, Fecha_fin, "
-                    + "Traslado, Observaciones from servicios where No_conf ='' and Traslado!='Solo_traslado' and "
-                    + "Fecha_inicio = '";
+                    + "Traslado, Observaciones from servicios where No_conf ='' and Traslado != 'Solo_traslado' and "
+                    + "Descripcion != 'CANCELADO' and CXX != 'SI' and CXX != 'SI_aloj' and Fecha_inicio = '";
         } else {
             query = "select Id_servicio, Descripcion, TE_alojamiento, Nombre_cliente, "
                     + "Apellido_cliente, Pax, Menores, Infantes, Hotel, No_conf, Fecha_inicio, Fecha_fin, "
                     + "Traslado, Observaciones from servicios where No_conf ='' and Traslado!='Solo_traslado' and "
-                    + "Hotel != '' and Fecha_inicio = '";
+                    + "Hotel != '' and Descripcion != 'CANCELADO' and CXX != 'SI' and CXX != 'SI_aloj' and "
+                    + "Fecha_inicio = '";
         }
 
         try {
             Connection cn = Conexion.conectar();
 
-            for (int i = 1; i <= days; i++) {
+            for (int i = 0; i <= days; i++) {
                 LocalDate day = today.plusDays(i);
 
 //                System.out.println("Iterando día: " + day.format(formato));
@@ -1102,4 +1007,113 @@ public class Hotel_sin_confirmar extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "!!Error al mostrar tabla...contacte al administrador");
         }
     }
+
+    private void setUp_JD() {
+        String Id_cliente = "", desde = "", hasta = "", nombre = "", apellido = "", cxx = "";
+
+        try {//descargando datos del servicio
+            Connection cn = Conexion.conectar();
+            PreparedStatement pst = cn.prepareStatement("select Id_cliente, Descripcion, TE_alojamiento, Hotel, "
+                    + "Destino, Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Reservado_fecha, Reservado_por, "
+                    + "Observaciones, Proveedor_trf, No_conf, Pax, Nombre_cliente, Menores, Infantes, "
+                    + "Apellido_cliente, Efectivo_hotel, Efectivo_trf, Credito_hotel, Credito_trf, Tarjeta_credito, "
+                    + "CXX from servicios where Id_servicio = '" + Id_servicioSeleccionado + "'");
+
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                Id_cliente = rs.getString("Id_cliente");
+                jTextField_descripcionServ.setText(rs.getString("Descripcion"));
+                jTextField_TEaloj.setText(rs.getString("TE_alojamiento"));
+                jTextField_hotel.setText(rs.getString("Hotel"));
+                jComboBox_destino.setSelectedItem(rs.getString("Destino"));
+                desde = rs.getString("Fecha_inicio");
+                hasta = rs.getString("Fecha_fin");
+                jComboBox_trf.setSelectedItem(rs.getString("Traslado"));
+                jTextField_TEtrf.setText(rs.getString("TE_traslado"));
+                jTextField_reservadoFecha.setText(rs.getString("Reservado_fecha"));
+                jTextField_reservadoPor.setText(rs.getString("Reservado_por"));
+                jTextArea1_observacionesServicio.setText(rs.getString("Observaciones"));
+                jComboBox_proveedorTRF.setSelectedItem(rs.getString("Proveedor_trf"));
+                jTextField_confirmacion.setText(rs.getString("No_conf"));
+                jTextField_pax.setText(rs.getString("Pax"));
+                nombre = rs.getString("Nombre_cliente");
+                jTextField_menor.setText(rs.getString("Menores"));
+                jTextField_infante.setText(rs.getString("Infantes"));
+                apellido = rs.getString("Apellido_cliente");
+                jTextField_aloj_efectivo.setText(String.valueOf(rs.getDouble("Efectivo_hotel")));
+                jTextField_trf_efectivo.setText(String.valueOf(rs.getDouble("Efectivo_trf")));
+                jTextField_aloj_credito.setText(String.valueOf(rs.getDouble("Credito_hotel")));
+                jTextField_trf_credito.setText(String.valueOf(rs.getDouble("Credito_trf")));
+                jTextArea1_tarjetas_credito.setText(rs.getString("Tarjeta_credito"));
+                cxx = rs.getString("CXX");
+            }
+            cn.close();
+        } catch (SQLException ev) {
+            System.err.println("Error al intentar obtener datos del servicio: " + ev);
+            JOptionPane.showMessageDialog(null, "Error al conectarse con la BD. Contacte al administrador.");
+        }
+
+        try {//colocando fechas en jdatechooser
+            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+            Date fecha_desde = formato.parse(desde);
+            Date fecha_hasta = formato.parse(hasta);
+            jDateChooser_fechaIda.setDate(fecha_desde);
+            jDateChooser_fechaRegreso.setDate(fecha_hasta);
+        } catch (ParseException ev) {
+            System.err.println("Error parseando fecha: " + ev);
+        }
+
+        if (!Id_cliente.equals("")) {//llenando datos cliente vinculado al servicio
+            try {
+                Connection cn1 = Conexion.conectar();
+                PreparedStatement pst1 = cn1.prepareStatement("select Nombre, Apellido, Nacionalidad, Telefono_fijo, "
+                        + "Telefono_cell, E_mail, Observaciones from clientes where Id_cliente = '" + Id_cliente + "'");
+
+                ResultSet rs1 = pst1.executeQuery();
+
+                if (rs1.next()) {
+                    jTextField_nombreCliente.setText(rs1.getString("Nombre"));
+                    jTextField_apellidoCliente.setText(rs1.getString("Apellido"));
+                    jTextField_nacionalidadCliente.setText(rs1.getString("Nacionalidad"));
+                    jTextField_telefonoCliente.setText(rs1.getString("Telefono_fijo"));
+                    jTextField_celularCliente.setText(rs1.getString("Telefono_cell"));
+                    jTextField_EmailCliente.setText(rs1.getString("E_mail"));
+                    jTextArea1_observacionesCliente.setText(rs1.getString("Observaciones"));
+
+                    cn1.close();
+                } else {
+                    jTextField_nombreCliente.setText(nombre);
+                    jTextField_apellidoCliente.setText(apellido);
+                }
+            } catch (SQLException ev) {
+                System.err.println("Error accediendo tabla clientes en constructor: " + ev);
+                JOptionPane.showMessageDialog(null, "!!Error conectando con BD. Contacte al administrador.");
+            }
+        } else {
+            jTextField_nombreCliente.setText(nombre);
+            jTextField_apellidoCliente.setText(apellido);
+        }
+
+        if (cxx.equals("SI")) {
+            jLabel_CXX.setText("RESERVA CANCELADA");
+            Disegno_jLabel_cxx();
+        } else if (cxx.equals("SI_trf")) {
+            jLabel_CXX.setText("TE DE TRASLADO CANCELADO");
+            Disegno_jLabel_cxx();
+        } else if (cxx.equals("SI_aloj")) {
+            jLabel_CXX.setText("TE DE ALOJAMIENTO CANCELADO");
+            Disegno_jLabel_cxx();
+        }
+
+        jDialog_Servicio_actualizar.setVisible(true);
+    }
+
+    private void Disegno_jLabel_cxx() {
+        jLabel_CXX.setBorder(BorderFactory.createLineBorder(Color.red, 4));
+        Border borde = jLabel_CXX.getBorder();
+        Border margen = new EmptyBorder(10, 10, 10, 10);
+        jLabel_CXX.setBorder(new CompoundBorder(borde, margen));
+    }
+
 }

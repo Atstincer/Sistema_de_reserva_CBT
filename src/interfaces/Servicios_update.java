@@ -5,33 +5,37 @@
  */
 package interfaces;
 
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.sql.Connection;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import javax.swing.JOptionPane;
 import clases.Conexion;
+import clases.Util;
 import java.awt.Color;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 
 /**
  *
  * @author ALEX
  */
-public class Servicios_update extends javax.swing.JFrame {
+public class Servicios_update extends javax.swing.JDialog {
 
-    private String Id_servicio;
+    private String id_servicio, cxx;
+    private String[] servicio = new String[21];
 
     /**
-     * Creates new form Servicios_agregar_modificar
+     * Creates new form Servicios_updateJD
      */
-    public Servicios_update() {
+    public Servicios_update(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
         initComponents();
         setSize(740, 625);
         setResizable(false);
@@ -39,105 +43,9 @@ public class Servicios_update extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        Id_servicio = String.valueOf(Servicios_tablaFiltro.Id_servicioSeleccionado);
-        String Id_cliente = "", desde = "", hasta = "", nombre = "", apellido = "";
-        
-        Color colorJDateFondo = new Color(204,204,204);        
-        ((JTextField)jDateChooser_fechaIda.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
-        ((JTextField)jDateChooser_fechaRegreso.getDateEditor().getUiComponent()).setBackground(colorJDateFondo); 
-
-        try {//descargando datos del servicio
-            Connection cn = Conexion.conectar();
-            PreparedStatement pst = cn.prepareStatement("select Id_cliente, Descripcion, TE_alojamiento, Hotel, Destino, "
-                    + "Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Reservado_fecha, Reservado_por, Observaciones, "
-                    + "Proveedor_trf, No_conf, Pax, Nombre_cliente, Menores, Infantes, Apellido_cliente, Efectivo_hotel, "
-                    + "Efectivo_trf, Credito_hotel, Credito_trf, Tarjeta_credito from servicios where Id_servicio = '"
-                    + "" + Id_servicio + "'");
-
-            ResultSet rs = pst.executeQuery();
-
-            if (rs.next()) {
-                Id_cliente = rs.getString("Id_cliente");
-                jTextField_descripcionServ.setText(rs.getString("Descripcion"));
-                jTextField_TEaloj.setText(rs.getString("TE_alojamiento"));
-                jTextField_hotel.setText(rs.getString("Hotel"));
-                jComboBox_destino.setSelectedItem(rs.getString("Destino"));
-                desde = rs.getString("Fecha_inicio");
-                hasta = rs.getString("Fecha_fin");
-                jComboBox_trf.setSelectedItem(rs.getString("Traslado"));
-                jTextField_TEtrf.setText(rs.getString("TE_traslado"));
-                jTextField_reservadoFecha.setText(rs.getString("Reservado_fecha"));
-                jTextField_reservadoPor.setText(rs.getString("Reservado_por"));
-                jTextArea1_observacionesServicio.setText(rs.getString("Observaciones"));
-                jComboBox_proveedorTRF.setSelectedItem(rs.getString("Proveedor_trf"));
-                jTextField_confirmacion.setText(rs.getString("No_conf"));
-                jTextField_pax.setText(rs.getString("Pax"));
-                nombre = rs.getString("Nombre_cliente");
-                jTextField_menor.setText(rs.getString("Menores"));
-                jTextField_infante.setText(rs.getString("Infantes"));
-                apellido = rs.getString("Apellido_cliente");
-                jTextField_aloj_efectivo.setText(String.valueOf(rs.getDouble("Efectivo_hotel")));
-                jTextField_trf_efectivo.setText(String.valueOf(rs.getDouble("Efectivo_trf")));
-                jTextField_aloj_credito.setText(String.valueOf(rs.getDouble("Credito_hotel")));
-                jTextField_trf_credito.setText(String.valueOf(rs.getDouble("Credito_trf")));
-                jTextArea1_tarjetas_credito.setText(rs.getString("Tarjeta_credito"));
-            }
-            cn.close();
-        } catch (SQLException e) {
-            System.err.println("Error al intentar obtener datos del servicio: " + e);
-            JOptionPane.showMessageDialog(null, "Error al conectarse con la BD. Contacte al administrador.");
-        }
-
-//        if (historial_modificaciones == null) {
-//            historial_modificaciones = "";
-//        }
-        try {//colocando fechas en jdatechooser
-            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-            Date fecha_desde = formato.parse(desde);
-            Date fecha_hasta = formato.parse(hasta);
-            jDateChooser_fechaIda.setDate(fecha_desde);
-            jDateChooser_fechaRegreso.setDate(fecha_hasta);
-        } catch (ParseException e) {
-            System.err.println("Error parseando fecha: " + e);
-        }
-
-        if (!Id_cliente.equals("")) {//llenando datos cliente vinculado al servicio
-            try {
-                Connection cn1 = Conexion.conectar();
-                PreparedStatement pst1 = cn1.prepareStatement("select Nombre, Apellido, Nacionalidad, Telefono_fijo, "
-                        + "Telefono_cell, E_mail, Observaciones from clientes where Id_cliente = '" + Id_cliente + "'");
-
-                ResultSet rs1 = pst1.executeQuery();
-
-                if (rs1.next()) {
-                    jTextField_nombreCliente.setText(rs1.getString("Nombre"));
-                    jTextField_apellidoCliente.setText(rs1.getString("Apellido"));
-                    jTextField_nacionalidadCliente.setText(rs1.getString("Nacionalidad"));
-                    jTextField_telefonoCliente.setText(rs1.getString("Telefono_fijo"));
-                    jTextField_celularCliente.setText(rs1.getString("Telefono_cell"));
-                    jTextField_EmailCliente.setText(rs1.getString("E_mail"));
-                    jTextArea1_observacionesCliente.setText(rs1.getString("Observaciones"));
-
-                    cn1.close();
-                } else {
-                    jTextField_nombreCliente.setText(nombre);
-                    jTextField_apellidoCliente.setText(apellido);
-                }
-            } catch (SQLException e) {
-                System.err.println("Error accediendo tabla clientes en constructor: " + e);
-                JOptionPane.showMessageDialog(null, "!!Error conectando con BD. Contacte al administrador.");
-            }
-        } else {
-            jTextField_nombreCliente.setText(nombre);
-            jTextField_apellidoCliente.setText(apellido);
-        }
-
-    }
-
-    @Override
-    public Image getIconImage() {
-        Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("images/Icon.png"));
-        return retValue;
+        Color colorJDateFondo = new Color(204, 204, 204);
+        ((JTextField) jDateChooser_fechaIda.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
+        ((JTextField) jDateChooser_fechaRegreso.getDateEditor().getUiComponent()).setBackground(colorJDateFondo);
     }
 
     /**
@@ -152,7 +60,7 @@ public class Servicios_update extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField_pax = new javax.swing.JTextField();
+        jTextField_adultos = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jTextField_descripcionServ = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -216,9 +124,9 @@ public class Servicios_update extends javax.swing.JFrame {
         jTextField_trf_efectivo = new javax.swing.JTextField();
         jTextField_trf_credito = new javax.swing.JTextField();
         jLabel32 = new javax.swing.JLabel();
+        jLabel_CXX = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setIconImage(getIconImage());
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(153, 153, 153));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -231,10 +139,10 @@ public class Servicios_update extends javax.swing.JFrame {
         jLabel2.setText("Adu");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 90, -1, -1));
 
-        jTextField_pax.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField_pax.setForeground(new java.awt.Color(0, 0, 115));
-        jTextField_pax.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 5, 1, 1));
-        jPanel1.add(jTextField_pax, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 105, 30, 30));
+        jTextField_adultos.setBackground(new java.awt.Color(204, 204, 204));
+        jTextField_adultos.setForeground(new java.awt.Color(0, 0, 115));
+        jTextField_adultos.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 5, 1, 1));
+        jPanel1.add(jTextField_adultos, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 105, 30, 30));
 
         jLabel3.setForeground(new java.awt.Color(255, 0, 0));
         jLabel3.setText("Descripción");
@@ -541,6 +449,9 @@ public class Servicios_update extends javax.swing.JFrame {
         jLabel32.setText("Traslado");
         jPanel1.add(jLabel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 285, -1, -1));
 
+        jLabel_CXX.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jPanel1.add(jLabel_CXX, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 20, -1, 50));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -561,224 +472,60 @@ public class Servicios_update extends javax.swing.JFrame {
 
     private void jButton_actualizarServActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_actualizarServActionPerformed
         // TODO add your handling code here:
-        String descripcion = jTextField_descripcionServ.getText();
-        String hotel = jTextField_hotel.getText();
-        String adultos = jTextField_pax.getText();
-        String menores = jTextField_menor.getText();
-        String infante = jTextField_infante.getText();
-        String te_alojamiento = jTextField_TEaloj.getText();
-        String destino = jComboBox_destino.getSelectedItem().toString();
-        String te_traslado = jTextField_TEtrf.getText();
-        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-        Date fecha_desde = jDateChooser_fechaIda.getDate();
-        Date fecha_hasta = jDateChooser_fechaRegreso.getDate();
-        String desde = "";
-        String hasta = "";
-        if (fecha_desde != null) {
-            desde = formato.format(fecha_desde);
-        } else {
-            desde = "";
-        }
-        if (fecha_hasta != null) {
-            hasta = formato.format(fecha_hasta);
-        } else {
-            hasta = "";
-        }
-        String proveedorTRF = jComboBox_proveedorTRF.getSelectedItem().toString();
-        String traslado = jComboBox_trf.getSelectedItem().toString();
-        String observaciones_serv = jTextArea1_observacionesServicio.getText();
-        String confirmacion = jTextField_confirmacion.getText().toUpperCase();
-        Calendar calendar = Calendar.getInstance();
-        int dia = calendar.get(Calendar.DATE);
-        int mes = calendar.get(Calendar.MONTH) + 1;
-        int anio = calendar.get(Calendar.YEAR);
-        String fechaModificado = dia + "/" + mes + "/" + anio;
-        int validarServ = 0;
+        Vaciar_vector();
+        Llenar_vector();
 
-        String aloj_efectivo = jTextField_aloj_efectivo.getText();
-        if (!aloj_efectivo.equals("")) {
-            if (!EsDouble(aloj_efectivo)) {
-                JOptionPane.showMessageDialog(null, "Campo 'alojamiento efectivo' admite solamente números.");
-                validarServ = 1;
-            }
-        } else {
-            aloj_efectivo = "0";
-        }
-        String aloj_credito = jTextField_aloj_credito.getText();
-        if (!aloj_credito.equals("")) {
-            if (!EsDouble(aloj_credito)) {
-                JOptionPane.showMessageDialog(null, "Campo 'alojamiento crédito' admite solamente números.");
-                validarServ = 1;
-            }
-        } else {
-            aloj_credito = "0";
-        }
-        String trf_efectivo = jTextField_trf_efectivo.getText();
-        if (!trf_efectivo.equals("")) {
-            if (!EsDouble(trf_efectivo)) {
-                JOptionPane.showMessageDialog(null, "Campo 'traslado efectivo' admite solamente números.");
-                validarServ = 1;
-            }
-        } else {
-            trf_efectivo = "0";
-        }
-        String trf_credito = jTextField_trf_credito.getText();
-        if (!trf_credito.equals("")) {
-            if (!EsDouble(trf_credito)) {
-                JOptionPane.showMessageDialog(null, "Campo 'traslado crédito' admite solamente números.");
-                validarServ = 1;
-            }
-        } else {
-            trf_credito = "0";
-        }
-        String tarjetas_credito = jTextArea1_tarjetas_credito.getText().toUpperCase();
-
-//        System.out.print("H efectivo: " + aloj_efectivo + ", credito: " + aloj_credito + "\n"
-//                + "TRF efectivo: " + trf_efectivo + ", credito: " + trf_credito + "\n");
-
-        //validando campos info servicio
-        if (descripcion.equals("") || desde.equals("") || hasta.equals("")) {
-            JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente los campos 'Descripcion', \n"
-                    + "'Desde' y 'Hasta'.");
-            validarServ = 1;
-        }
-
-        if (!adultos.equals("")) {//validando campo adultos
-            if (!EsInt(adultos)) {
-                JOptionPane.showMessageDialog(null, "El campo 'adultos' admite solo números enteros.");
-                validarServ = 1;
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'adultos'.");
-            validarServ = 1;
-        }
-
-        if (!menores.equals("")) {//validando campo menores
-            if (!EsInt(menores)) {
-                JOptionPane.showMessageDialog(null, "El campo 'niños' admite solo números enteros.");
-                validarServ = 1;
-            }
-        } else {
-            menores = "0";
-        }
-
-        if (!infante.equals("")) {//validando campo infante
-            if (!EsInt(infante)) {
-                JOptionPane.showMessageDialog(null, "El campo 'infante' admite solo números enteros.");
-                validarServ = 1;
-            }
-        } else {
-            infante = "0";
-        }
-
-        //validando campo TE_traslado, trf efectivo y crédito
-        if (traslado.equals("No")) {
-            proveedorTRF = "";
-            te_traslado = "";
-            trf_efectivo = "0";
-            trf_credito = "0";
-            jTextField_TEtrf.setText("");
-            jTextField_trf_efectivo.setText("");
-            jTextField_trf_credito.setText("");
-        } else {
-            if (te_traslado.equals("") || (trf_efectivo.equals("0") && trf_credito.equals("0"))) {
-                JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE traslado'\n"
-                        + "y los valores de efectivo/crédito correspondientes.");
-                validarServ = 1;
-            }
-        }
-
-        //validando campo TE_alojamiento, alojamiento efectivo y crédito
-        if (traslado.equals("Solo_traslado")) {
-            te_alojamiento = "";
-            aloj_efectivo = "0";
-            aloj_credito = "0";
-            jTextField_TEaloj.setText("");
-            jTextField_aloj_efectivo.setText("");
-            jTextField_aloj_credito.setText("");
-        } else {
-            if (te_alojamiento.equals("") || (aloj_efectivo.equals("0") && aloj_credito.equals("0"))) {
-                JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE_alojamiento'\n"
-                        + "y los valores de efectivo/crédito correspondientes.");
-                validarServ = 1;
-            }
-        }
-
-        //comprobando existencia de TE_alojamiento ó TE_traslado en BD
-        if (!te_alojamiento.equals("") || !te_traslado.equals("")) {
-            try {
-                Connection cn2 = Conexion.conectar();
-                PreparedStatement pst2 = cn2.prepareStatement(QueryVerificarCoincidenciaTE(te_alojamiento, te_traslado));
-
-                ResultSet rs2 = pst2.executeQuery();
-
-                while (rs2.next()) {
-                    String Id_servicio_encontrado = rs2.getString("Id_servicio");
-                    if (!Id_servicio_encontrado.equals(Id_servicio)) {
-                        JOptionPane.showMessageDialog(null, "El ticket de alojamiento o de traslado coincide con los datos \n"
-                                + "de algún otro servicio reservado con anterioridad. Chequee por favor.");
-                        validarServ = 1;
-                    }
-                }
-
-                cn2.close();
-            } catch (SQLException e) {
-                System.err.println("Error al comprobar existencia en BD de TEalojamiento y TEtraslado: " + e);
-                JOptionPane.showMessageDialog(null, "!!Error al conectar con la base de datos. Contacte al administrador.");
-            }
-        }
-
-        if (validarServ == 0) {//actualizando BD tabla Servicios
+        if (Validar_campos()) {//actualizando BD tabla Servicios
 
             String historial_modificaciones = "";
 
             try {
-                Connection cn3 = Conexion.conectar();
-                PreparedStatement pst3 = cn3.prepareStatement("select Historial_modificaciones from servicios where "
-                        + "Id_servicio = '" + Id_servicio + "'");
+                Connection cn = Conexion.conectar();
+                PreparedStatement pst = cn.prepareStatement("select Historial_modificaciones from servicios where "
+                        + "Id_servicio = '" + id_servicio + "'");
 
-                ResultSet rs3 = pst3.executeQuery();
+                ResultSet rs = pst.executeQuery();
 
-                if (rs3.next()) {
-                    historial_modificaciones = rs3.getString("Historial_modificaciones");
+                if (rs.next()) {
+                    historial_modificaciones = rs.getString("Historial_modificaciones");
                 }
 
                 if (historial_modificaciones == null) {
                     historial_modificaciones = "";
                 }
-                historial_modificaciones += fechaModificado + " - " + Login.user + "\n";
+                historial_modificaciones += servicio[19] + " - " + servicio[20] + "\n";//fecha+usuario
 
-                pst3 = cn3.prepareStatement("update Servicios set Descripcion=?, TE_alojamiento=?, "
+                pst = cn.prepareStatement("update Servicios set Descripcion=?, TE_alojamiento=?, "
                         + "Hotel=?, Destino=?, Fecha_inicio=?, Fecha_fin=?, Traslado=?, TE_traslado=?, Observaciones=?, "
                         + "Proveedor_trf=?, No_conf=?, Pax=?, Historial_modificaciones=?, Menores=?, Infantes=?, "
                         + "Efectivo_hotel=?, Efectivo_trf=?, Credito_hotel=?, Credito_trf=?, Tarjeta_credito=? "
-                        + "where Id_servicio = '" + Id_servicio + "'");
+                        + "where Id_servicio = '" + id_servicio + "'");
 
-                pst3.setString(1, descripcion);
-                pst3.setString(2, te_alojamiento);
-                pst3.setString(3, hotel);
-                pst3.setString(4, destino);
-                pst3.setString(5, desde);
-                pst3.setString(6, hasta);
-                pst3.setString(7, traslado);
-                pst3.setString(8, te_traslado);
-                pst3.setString(9, observaciones_serv);
-                pst3.setString(10, proveedorTRF);
-                pst3.setString(11, confirmacion);
-                pst3.setString(12, adultos);
-                pst3.setString(13, historial_modificaciones);
-                pst3.setString(14, menores);
-                pst3.setString(15, infante);
-                pst3.setDouble(16, Double.parseDouble(aloj_efectivo));
-                pst3.setDouble(17, Double.parseDouble(trf_efectivo));
-                pst3.setDouble(18, Double.parseDouble(aloj_credito));
-                pst3.setDouble(19, Double.parseDouble(trf_credito));
-                pst3.setString(20, tarjetas_credito);
+                pst.setString(1, servicio[0]);//descripcion
+                pst.setString(2, servicio[5]);//TE alojamiento
+                pst.setString(3, servicio[1]);//hotel
+                pst.setString(4, servicio[12]);//destino
+                pst.setString(5, servicio[8]);//desde
+                pst.setString(6, servicio[9]);//hasta
+                pst.setString(7, servicio[11]);//traslado?
+                pst.setString(8, servicio[7]);//TE traslado
+                pst.setString(9, servicio[18]);//observaciones servicio
+                pst.setString(10, servicio[10]);//proveedor
+                pst.setString(11, servicio[6]);//confirmacion
+                pst.setString(12, servicio[2]);//adultos
+                pst.setString(13, historial_modificaciones);
+                pst.setString(14, servicio[3]);//menores
+                pst.setString(15, servicio[4]);//infante
+                pst.setDouble(16, Double.parseDouble(servicio[13]));//alojamiento efectivo
+                pst.setDouble(17, Double.parseDouble(servicio[15]));//trf efectivo
+                pst.setDouble(18, Double.parseDouble(servicio[14]));//alojamiento crédito
+                pst.setDouble(19, Double.parseDouble(servicio[16]));//trf crédito
+                pst.setString(20, servicio[17]);//tarjeta crédito
 
-                pst3.executeUpdate();
+                pst.executeUpdate();
 
-                cn3.close();
-                JOptionPane.showMessageDialog(null, "Información del servicio actualizada correctamente.");
+                cn.close();
+                JOptionPane.showMessageDialog(null, "Información actualizada correctamente.");
                 dispose();
             } catch (SQLException e) {
                 System.err.println("Error al registrar datos en tabla servicios: " + e);
@@ -786,7 +533,6 @@ public class Servicios_update extends javax.swing.JFrame {
             }
 
         }
-
     }//GEN-LAST:event_jButton_actualizarServActionPerformed
 
     private void jTextField_reservadoPorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_reservadoPorActionPerformed
@@ -798,21 +544,21 @@ public class Servicios_update extends javax.swing.JFrame {
         String historial_modificaciones = "";
 
         try {
-            Connection cn3 = Conexion.conectar();
-            PreparedStatement pst3 = cn3.prepareStatement("select Historial_modificaciones from servicios where "
-                    + "Id_servicio = '" + Id_servicio + "'");
+            Connection cn = Conexion.conectar();
+            PreparedStatement pst = cn.prepareStatement("select Historial_modificaciones from servicios where "
+                    + "Id_servicio = '" + id_servicio + "'");
 
-            ResultSet rs3 = pst3.executeQuery();
+            ResultSet rs = pst.executeQuery();
 
-            if (rs3.next()) {
-                historial_modificaciones = rs3.getString("Historial_modificaciones");
+            if (rs.next()) {
+                historial_modificaciones = rs.getString("Historial_modificaciones");
             }
-            cn3.close();
+            cn.close();
         } catch (SQLException e) {
             System.err.println("Error accediendo a tabla servicios: " + e);
         }
-        
-        if(historial_modificaciones == null || historial_modificaciones == ""){
+
+        if (historial_modificaciones == null || historial_modificaciones == "") {
             historial_modificaciones = "No se ha realizado ninguna modificación a esta reserva.";
         }
 
@@ -854,17 +600,18 @@ public class Servicios_update extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
 
-        /* Create and display the form */
+        /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Servicios_update().setVisible(true);
+                Servicios_update dialog = new Servicios_update(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
             }
         });
     }
@@ -909,6 +656,7 @@ public class Servicios_update extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabel_CXX;
     private javax.swing.JLabel jLabel_footer;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -920,6 +668,7 @@ public class Servicios_update extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField_EmailCliente;
     private javax.swing.JTextField jTextField_TEaloj;
     private javax.swing.JTextField jTextField_TEtrf;
+    private javax.swing.JTextField jTextField_adultos;
     private javax.swing.JTextField jTextField_aloj_credito;
     private javax.swing.JTextField jTextField_aloj_efectivo;
     private javax.swing.JTextField jTextField_apellidoCliente;
@@ -931,7 +680,6 @@ public class Servicios_update extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField_menor;
     private javax.swing.JTextField jTextField_nacionalidadCliente;
     private javax.swing.JTextField jTextField_nombreCliente;
-    private javax.swing.JTextField jTextField_pax;
     private javax.swing.JTextField jTextField_reservadoFecha;
     private javax.swing.JTextField jTextField_reservadoPor;
     private javax.swing.JTextField jTextField_telefonoCliente;
@@ -939,37 +687,342 @@ public class Servicios_update extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField_trf_efectivo;
     // End of variables declaration//GEN-END:variables
 
+    public void Set_it_up(String id){
+        id_servicio = id;
+//        System.out.println("Dentro de Recibe_id() en JD: " + id);
+        
+        String Id_cliente = "", desde = "", hasta = "", nombre = "", apellido = "";
+        
+        try {//descargando datos del servicio
+            Connection cn = Conexion.conectar();
+            PreparedStatement pst = cn.prepareStatement("select Id_cliente, Descripcion, TE_alojamiento, Hotel, Destino, "
+                    + "Fecha_inicio, Fecha_fin, Traslado, TE_traslado, Reservado_fecha, Reservado_por, Observaciones, "
+                    + "Proveedor_trf, No_conf, Pax, Nombre_cliente, Menores, Infantes, Apellido_cliente, Efectivo_hotel, "
+                    + "Efectivo_trf, Credito_hotel, Credito_trf, Tarjeta_credito, CXX from servicios where "
+                    + "Id_servicio = '" + id_servicio + "'");
+
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                Id_cliente = rs.getString("Id_cliente");
+                jTextField_descripcionServ.setText(rs.getString("Descripcion"));
+                jTextField_TEaloj.setText(rs.getString("TE_alojamiento"));
+                jTextField_hotel.setText(rs.getString("Hotel"));
+                jComboBox_destino.setSelectedItem(rs.getString("Destino"));
+                desde = rs.getString("Fecha_inicio");
+                hasta = rs.getString("Fecha_fin");
+                jComboBox_trf.setSelectedItem(rs.getString("Traslado"));
+                jTextField_TEtrf.setText(rs.getString("TE_traslado"));
+                jTextField_reservadoFecha.setText(rs.getString("Reservado_fecha"));
+                jTextField_reservadoPor.setText(rs.getString("Reservado_por"));
+                jTextArea1_observacionesServicio.setText(rs.getString("Observaciones"));
+                jComboBox_proveedorTRF.setSelectedItem(rs.getString("Proveedor_trf"));
+                jTextField_confirmacion.setText(rs.getString("No_conf"));
+                jTextField_adultos.setText(rs.getString("Pax"));
+                nombre = rs.getString("Nombre_cliente");
+                jTextField_menor.setText(rs.getString("Menores"));
+                jTextField_infante.setText(rs.getString("Infantes"));
+                apellido = rs.getString("Apellido_cliente");
+                jTextField_aloj_efectivo.setText(String.valueOf(rs.getDouble("Efectivo_hotel")));
+                jTextField_trf_efectivo.setText(String.valueOf(rs.getDouble("Efectivo_trf")));
+                jTextField_aloj_credito.setText(String.valueOf(rs.getDouble("Credito_hotel")));
+                jTextField_trf_credito.setText(String.valueOf(rs.getDouble("Credito_trf")));
+                jTextArea1_tarjetas_credito.setText(rs.getString("Tarjeta_credito"));
+                cxx = rs.getString("CXX");
+            }
+            cn.close();
+        } catch (SQLException e) {
+            System.err.println("Error al intentar obtener datos del servicio: " + e);
+            JOptionPane.showMessageDialog(null, "Error al conectarse con la BD. Contacte al administrador.");
+        }
+
+        try {//colocando fechas en jdatechooser
+            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+            Date fecha_desde = formato.parse(desde);
+            Date fecha_hasta = formato.parse(hasta);
+            jDateChooser_fechaIda.setDate(fecha_desde);
+            jDateChooser_fechaRegreso.setDate(fecha_hasta);
+        } catch (ParseException e) {
+            System.err.println("Error parseando fecha: " + e);
+        }
+
+        if (!Id_cliente.equals("")) {//llenando datos cliente vinculado al servicio
+            try {
+                Connection cn1 = Conexion.conectar();
+                PreparedStatement pst1 = cn1.prepareStatement("select Nombre, Apellido, Nacionalidad, Telefono_fijo, "
+                        + "Telefono_cell, E_mail, Observaciones from clientes where Id_cliente = '" + Id_cliente + "'");
+
+                ResultSet rs1 = pst1.executeQuery();
+
+                if (rs1.next()) {
+                    jTextField_nombreCliente.setText(rs1.getString("Nombre"));
+                    jTextField_apellidoCliente.setText(rs1.getString("Apellido"));
+                    jTextField_nacionalidadCliente.setText(rs1.getString("Nacionalidad"));
+                    jTextField_telefonoCliente.setText(rs1.getString("Telefono_fijo"));
+                    jTextField_celularCliente.setText(rs1.getString("Telefono_cell"));
+                    jTextField_EmailCliente.setText(rs1.getString("E_mail"));
+                    jTextArea1_observacionesCliente.setText(rs1.getString("Observaciones"));
+
+                    cn1.close();
+                } else {
+                    jTextField_nombreCliente.setText(nombre);
+                    jTextField_apellidoCliente.setText(apellido);
+                }
+            } catch (SQLException e) {
+                System.err.println("Error accediendo tabla clientes en constructor: " + e);
+                JOptionPane.showMessageDialog(null, "!!Error conectando con BD. Contacte al administrador.");
+            }
+        } else {
+            jTextField_nombreCliente.setText(nombre);
+            jTextField_apellidoCliente.setText(apellido);
+        }
+
+        if (cxx.equals("SI")) {
+            jLabel_CXX.setText("RESERVA CANCELADA");
+            Enable_components(false);
+            Disegno_jLabel_cxx();
+        } else if (cxx.equals("SI_trf")) {
+            jLabel_CXX.setText("TE DE TRASLADO CANCELADO");
+            Enable_components_TEtrf(false);
+            Disegno_jLabel_cxx();
+        } else if (cxx.equals("SI_aloj")) {
+            jLabel_CXX.setText("TE DE ALOJAMIENTO CANCELADO");
+            Enable_components_TEaloj(false);
+            Disegno_jLabel_cxx();
+        }
+    }
+    
+    private void Enable_components_TEtrf(boolean x) {
+        jTextField_TEtrf.setEditable(x);
+        jComboBox_proveedorTRF.setEnabled(x);
+        jComboBox_destino.setEnabled(x);
+        jComboBox_trf.setEnabled(x);
+        jTextField_trf_efectivo.setEditable(x);
+        jTextField_trf_credito.setEditable(x);
+    }
+
+    private void Enable_components_TEaloj(boolean x) {
+        jTextField_TEaloj.setEditable(x);
+        jTextField_confirmacion.setEditable(x);
+        jTextField_aloj_efectivo.setEditable(x);
+        jTextField_aloj_credito.setEditable(x);
+    }
+
+    private void Enable_components(boolean x) {
+        Enable_components_TEaloj(x);
+        Enable_components_TEtrf(x);
+        jTextField_descripcionServ.setEditable(x);
+        jTextField_hotel.setEditable(x);
+        jTextField_adultos.setEditable(x);
+        jTextField_menor.setEditable(x);
+        jTextField_infante.setEditable(x);
+        jDateChooser_fechaIda.setEnabled(x);
+        jDateChooser_fechaRegreso.setEnabled(x);
+        jTextArea1_observacionesServicio.setEditable(x);
+        jTextArea1_tarjetas_credito.setEditable(x);
+        jButton_actualizarServ.setEnabled(x);
+    }
+
+    private void Vaciar_vector() {
+        for (int i = 0; i < servicio.length; i++) {
+            servicio[i] = "";
+        }
+    }
+
+    private void Llenar_vector() {
+        servicio[0] = jTextField_descripcionServ.getText();
+        servicio[1] = jTextField_hotel.getText();
+        servicio[2] = jTextField_adultos.getText();
+        servicio[3] = jTextField_menor.getText();
+        servicio[4] = jTextField_infante.getText();
+        servicio[5] = jTextField_TEaloj.getText();
+        servicio[6] = jTextField_confirmacion.getText().toUpperCase();
+        servicio[7] = jTextField_TEtrf.getText();
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        Date fecha_desde = jDateChooser_fechaIda.getDate();
+        Date fecha_hasta = jDateChooser_fechaRegreso.getDate();
+        if (fecha_desde != null) {
+            servicio[8] = formato.format(fecha_desde);
+        } else {
+            servicio[8] = "";
+        }
+        if (fecha_hasta != null) {
+            servicio[9] = formato.format(fecha_hasta);
+        } else {
+            servicio[9] = "";
+        }
+        servicio[10] = jComboBox_proveedorTRF.getSelectedItem().toString();
+        servicio[11] = jComboBox_trf.getSelectedItem().toString();
+        servicio[12] = jComboBox_destino.getSelectedItem().toString();
+        servicio[13] = jTextField_aloj_efectivo.getText();
+        servicio[14] = jTextField_aloj_credito.getText();
+        servicio[15] = jTextField_trf_efectivo.getText();
+        servicio[16] = jTextField_trf_credito.getText();
+        servicio[17] = jTextArea1_tarjetas_credito.getText().toUpperCase();
+        servicio[18] = jTextArea1_observacionesServicio.getText();
+        servicio[19] = Util.getFecha_actual();
+        servicio[20] = Login.user;
+    }
+
+    private boolean Validar_campos() {
+        if (!servicio[13].equals("")) {//alojamiento efectivo
+            if (!Util.EsDouble(servicio[13])) {
+                JOptionPane.showMessageDialog(null, "Campo 'alojamiento efectivo' admite solamente números.");
+                return false;
+            }
+        } else {
+            servicio[13] = "0";
+        }
+
+        if (!servicio[14].equals("")) {//alojamiento crédito
+            if (!Util.EsDouble(servicio[14])) {
+                JOptionPane.showMessageDialog(null, "Campo 'alojamiento crédito' admite solamente números.");
+                return false;
+            }
+        } else {
+            servicio[14] = "0";
+        }
+
+        if (!servicio[15].equals("")) {//traslado efectivo
+            if (!Util.EsDouble(servicio[15])) {
+                JOptionPane.showMessageDialog(null, "Campo 'traslado efectivo' admite solamente números.");
+                return false;
+            }
+        } else {
+            servicio[15] = "0";
+        }
+
+        if (!servicio[16].equals("")) {//traslado crédito
+            if (!Util.EsDouble(servicio[16])) {
+                JOptionPane.showMessageDialog(null, "Campo 'traslado crédito' admite solamente números.");
+                return false;
+            }
+        } else {
+            servicio[16] = "0";
+        }
+
+        //validando campos info servicio
+        if (servicio[0].equals("") || servicio[8].equals("") || servicio[9].equals("")) {
+            JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente los campos 'Descripcion', \n"
+                    + "'Desde' y 'Hasta'.");
+            return false;
+        }
+
+        if (!servicio[2].equals("")) {//validando campo adultos
+            if (!Util.EsInt(servicio[2])) {
+                JOptionPane.showMessageDialog(null, "El campo 'adultos' admite solo números enteros.");
+                return false;
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'adultos'.");
+            return false;
+        }
+
+        if (!servicio[3].equals("")) {//validando campo menores
+            if (!Util.EsInt(servicio[3])) {
+                JOptionPane.showMessageDialog(null, "El campo 'niños' admite solo números enteros.");
+                return false;
+            }
+        } else {
+            servicio[3] = "0";
+        }
+
+        if (!servicio[4].equals("")) {//validando campo infante
+            if (!Util.EsInt(servicio[4])) {
+                JOptionPane.showMessageDialog(null, "El campo 'infante' admite solo números enteros.");
+                return false;
+            }
+        } else {
+            servicio[4] = "0";
+        }
+
+        //validando campo TE_traslado, trf efectivo y crédito
+        if (servicio[11].equals("No")) {//traslado?
+            servicio[10] = "";//proveedor
+            servicio[7] = "";//TE trf
+            servicio[15] = "0";//trf_efectivo
+            servicio[16] = "0";//trf_crédito
+            jTextField_TEtrf.setText("");
+            jTextField_trf_efectivo.setText("");
+            jTextField_trf_credito.setText("");
+        } else {
+            if (servicio[7].equals("") || (servicio[15].equals("0") && servicio[16].equals("0")) || (servicio[15].equals("0.0") && servicio[16].equals("0.0"))) {
+                JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE traslado'\n"
+                        + "y los valores de efectivo/crédito correspondientes.");
+                return false;
+            }
+        }
+
+        //validando campo TE_alojamiento, alojamiento efectivo y crédito
+        if (servicio[11].equals("Solo_traslado")) {//traslado?
+            servicio[5] = "";//TE alojamiento
+            servicio[13] = "0";//alojamiento efectivo
+            servicio[14] = "0";//alojamiento crédito
+            jTextField_TEaloj.setText("");
+            jTextField_aloj_efectivo.setText("");
+            jTextField_aloj_credito.setText("");
+        } else {
+            if (servicio[5].equals("") || (servicio[13].equals("0") && servicio[14].equals("0")) || (servicio[13].equals("0.0") && servicio[14].equals("0.0"))) {
+                JOptionPane.showMessageDialog(null, "Asegúrese de llenar correctamente el campo 'TE_alojamiento'\n"
+                        + "y los valores de efectivo/crédito correspondientes.");
+                return false;
+            }
+        }
+        
+        if ((!servicio[14].equals("0") && !servicio[14].equals("0.0")) || (!servicio[16].equals("0") && !servicio[16].equals("0.0"))) {//validando campo tarjetas de crédito 
+            if (servicio[17].equals("")) {
+                JOptionPane.showMessageDialog(null, "Asegúrese de llenar el campo 'Tarjetas de crédito'.");
+                return false;
+            }
+        }
+
+        //comprobando existencia de TE_alojamiento ó TE_traslado en BD
+        if (!servicio[5].equals("") || !servicio[7].equals("")) {
+            try {
+                Connection cn = Conexion.conectar();
+                PreparedStatement pst = cn.prepareStatement(QueryVerificarCoincidenciaTE(servicio[5], servicio[7]));
+
+                ResultSet rs = pst.executeQuery();
+
+                while (rs.next()) {
+                    String Id_servicio_encontrado = rs.getString("Id_servicio");
+                    if (!Id_servicio_encontrado.equals(id_servicio)) {
+                        JOptionPane.showMessageDialog(null, "El ticket de alojamiento o de traslado coincide con los datos \n"
+                                + "de algún otro servicio reservado con anterioridad. Chequee por favor.");
+                        cn.close();
+                        return false;
+                    }
+                }
+                cn.close();
+            } catch (SQLException e) {
+                System.err.println("Error al comprobar existencia en BD de TEalojamiento y TEtraslado: " + e);
+                JOptionPane.showMessageDialog(null, "!!Error al conectar con la base de datos. Contacte al administrador.");
+            }
+        }
+        return true;
+    }
+    
     //query para verificar si info coincide con algun ticket registrado anteriormente
-    public String QueryVerificarCoincidenciaTE(String te_alojamiento, String te_traslado) {
+    private String QueryVerificarCoincidenciaTE(String te_alojamiento, String te_traslado) {
         String query = "";
         if (!te_alojamiento.equals("") && te_traslado.equals("")) {//buscar por te_alojamiento
-            query = "select Id_servicio from Servicios where TE_alojamiento = '" + te_alojamiento + "'";
+            query = "select Id_servicio from Servicios where TE_alojamiento = '" + te_alojamiento + "' or "
+                    + "TE_traslado = '" + te_alojamiento + "'";
         } else if (!te_alojamiento.equals("") && !te_traslado.equals("")) {//buscar por te_alojamiento y te_traslado
-            query = "select Id_servicio from Servicios where TE_alojamiento = '" + te_alojamiento + "' "
-                    + "or TE_traslado = '" + te_traslado + "'";
+            query = "select Id_servicio from Servicios where TE_alojamiento = '" + te_alojamiento + "' or "
+                    + "TE_alojamiento = '" + te_traslado + "' or TE_traslado = '" + te_alojamiento + "' or "
+                    + "TE_traslado = '" + te_traslado + "'";
         } else if (te_alojamiento.equals("") && !te_traslado.equals("")) {//buscar por te_traslado
-            query = "select Id_servicio from Servicios where TE_traslado = '" + te_traslado + "'";
+            query = "select Id_servicio from Servicios where TE_traslado = '" + te_traslado + "' or "
+                    + "TE_alojamiento = '" + te_traslado + "'";
         }
         return query;
     }
-
-    //comprobando si es número
-    public boolean EsDouble(String str) {
-        try {
-            double db = Double.parseDouble(str);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
-
-    //comprobando si es entero
-    public boolean EsInt(String a) {
-        try {
-            int b = Integer.parseInt(a);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
+    
+    private void Disegno_jLabel_cxx(){
+        jLabel_CXX.setBorder(BorderFactory.createLineBorder(Color.red,4));
+        Border borde = jLabel_CXX.getBorder();
+        Border margen = new EmptyBorder(10,10,10,10);
+        jLabel_CXX.setBorder(new CompoundBorder(borde,margen));
     }
 }

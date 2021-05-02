@@ -8,6 +8,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.swing.JTable;
@@ -156,6 +157,16 @@ public class Util {
         LocalDate fecha = LocalDate.now();
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return fecha.format(formato);
+    }
+    
+    public static boolean ValidDate(String str) {
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            df.parse(str);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
     
 //    public static void crearWord(){

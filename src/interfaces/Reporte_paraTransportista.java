@@ -351,24 +351,6 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
     private javax.swing.JTable jTable_serviciosRegreso;
     // End of variables declaration//GEN-END:variables
 
-//    //metodo para conformar DefaultTableMode
-//    public void Conformar_model(DefaultTableModel model, JTable tabla, JScrollPane jsp) {
-//        model.addColumn("Hotel");
-//        model.addColumn("Cliente");
-//        model.addColumn("Ad");
-//        model.addColumn("Men");
-//        model.addColumn("Inf");
-//        model.addColumn("Desde");
-//        model.addColumn("Hasta");
-//        model.addColumn("TE hotel");
-//        model.addColumn("Conf.");
-//        model.addColumn("TE TRF");
-//        model.addColumn("Observaciones");
-//
-//        tabla = new JTable(model);
-//        jsp.setViewportView(tabla);
-//    }
-    
     //metodo para conformar DefaultTableMode
     public void Conformar_model(DefaultTableModel model) {
         model.addColumn("Hotel");
@@ -390,43 +372,6 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
             model.removeRow(i);
         }
     }
-
-//    //metodo para calcular cantidad Total de pax
-//    public String Total_pax(DefaultTableModel model) {
-//        int filas = model.getRowCount();
-//        String totalPax = "";
-//        String cantPax[] = new String[filas * 3];
-//        int ad = 0, men = 0, inf = 0, posiciones = 0;
-//
-//        for (int i = 0; i < filas; i++) {
-//            for (int j = 2; j < 5; j++) {
-//                if (model.getValueAt(i, j) != null) {
-//                    cantPax[posiciones] = model.getValueAt(i, j).toString();
-//                } else {
-//                    cantPax[posiciones] = "0";
-//                }
-//                posiciones++;
-//            }
-//        }
-//
-//        for (int i = 0; i < cantPax.length; i++) {
-//            if (!cantPax[i].equals("")) {
-//                ad = ad + Integer.parseInt(cantPax[i]);
-//            }
-//            i++;
-//            if (!cantPax[i].equals("")) {
-//                men = men + Integer.parseInt(cantPax[i]);
-//            }
-//            i++;
-//            if (!cantPax[i].equals("")) {
-//                inf = inf + Integer.parseInt(cantPax[i]);
-//            }
-//        }
-//
-//        totalPax = ad + " + " + men + " + " + inf + " bb";
-//
-//        return totalPax;
-//    }
 
     //método para fijar ancho columnas
     public void FijarAnchoColumnas(JTable tabla) {
@@ -475,7 +420,7 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
 
                 PreparedStatement pst = cn.prepareStatement("select Id_cliente from servicios where Fecha_inicio = '"
                         + "" + fecha + "' and (Traslado = 'Si' or Traslado = 'Solo_ida' or Traslado = 'Solo_traslado') "
-                        + "and Destino = '" + destino + "'");
+                        + "and CXX != 'SI' and CXX != 'SI_trf' and Destino = '" + destino + "'");
 
                 ResultSet rs = pst.executeQuery();
 
@@ -531,16 +476,18 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
 //                    System.out.println("");
                     //llenando tabla
                     pst = cn.prepareStatement("select Hotel, Nombre_cliente, Pax, Menores, Infantes, "
-                            + "Fecha_inicio, Fecha_fin, TE_alojamiento, No_conf, TE_traslado, Observaciones, Apellido_cliente"
-                            + " from servicios where Fecha_inicio = '" + fecha + "' and (Traslado = 'Si' or Traslado = '"
-                            + "Solo_ida' or Traslado = 'Solo_traslado') and Destino = '" + destino + "'");
+                            + "Fecha_inicio, Fecha_fin, TE_alojamiento, No_conf, TE_traslado, Observaciones, "
+                            + "Apellido_cliente, CXX from servicios where Fecha_inicio = '" + fecha + "' and "
+                            + "(Traslado = 'Si' or Traslado = 'Solo_ida' or Traslado = 'Solo_traslado') and "
+                            + "Destino = '" + destino + "' and CXX != 'SI' and CXX != 'SI_trf'");
 
                     rs = pst.executeQuery();
 
                     Object fila[] = new Object[11];
+                    String cxx = "";
 
                     while (rs.next()) {                       
-                        for (int i = 0; i < 12; i++) {
+                        for (int i = 0; i < 13; i++) {
                             if (i == 2) {
                                 fila[i] = rs.getString(i + 1);
                                 if (!fila[i].toString().equals("")) {
@@ -561,6 +508,8 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
                                 if (apellido != null) {
                                     fila[1] = fila[1] + " " + apellido;
                                 }
+                            } else if (i == 12){
+                                cxx = rs.getString(i + 1);
                             } else {
                                 fila[i] = rs.getString(i + 1);
                             }
@@ -570,6 +519,10 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
                             fila[10] = fila[10] + "\n" + vector_celular_cliente_ida[posicion];
                         } else {
                             fila[10] = vector_celular_cliente_ida[posicion];
+                        }
+                        
+                        if(cxx.equals("SI_aloj")){
+                            fila[7] = "CXX";
                         }
 
                         model_ida.addRow(fila);
@@ -608,7 +561,7 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
                 //para tabla regreso
                 pst = cn.prepareStatement("select Id_cliente from servicios where Fecha_fin = '" + fecha + "' and "
                         + "(Traslado = 'Si' or Traslado = 'Solo_regreso' or Traslado = 'Solo_traslado') and "
-                        + "Destino = '" + destino + "'");
+                        + "Destino = '" + destino + "' and CXX != 'SI' and CXX != 'SI_trf'");
 
                 rs = pst.executeQuery();
 
@@ -665,21 +618,22 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
 //                    System.out.println("");
                     //llenando tabla Regreso
                     pst = cn.prepareStatement("select Hotel, Nombre_cliente, Pax, Menores, Infantes, "
-                            + "Fecha_inicio, Fecha_fin, TE_alojamiento, No_conf, TE_traslado, Observaciones, Apellido_cliente"
-                            + " from servicios where Fecha_fin = '" + fecha + "' and (Traslado = 'Si' or Traslado = '"
-                            + "Solo_regreso' or Traslado = 'Solo_traslado') and Destino = '" + destino + "'");
+                            + "Fecha_inicio, Fecha_fin, TE_alojamiento, No_conf, TE_traslado, Observaciones, "
+                            + "Apellido_cliente, CXX from servicios where Fecha_fin = '" + fecha + "' and "
+                            + "(Traslado = 'Si' or Traslado = 'Solo_regreso' or Traslado = 'Solo_traslado') and "
+                            + "Destino = '" + destino + "' and CXX != 'SI' and CXX != 'SI_trf'");
 
                     rs = pst.executeQuery();
 
                     Object fila[] = new Object[11];
+                    String cxx = "";
 
                     ad = 0;
                     men = 0;
                     inf = 0;
 
-                    while (rs.next()) {
-                        
-                        for (int i = 0; i < 12; i++) {
+                    while (rs.next()) {                        
+                        for (int i = 0; i < 13; i++) {
                             if (i == 2) {
                                 fila[i] = rs.getString(i + 1);
                                 if (!fila[i].toString().equals("")) {
@@ -700,7 +654,9 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
                                 if (apellido != null) {
                                     fila[1] = fila[1] + " " + apellido;
                                 }
-                            } else {
+                            } else if(i == 12) {
+                                cxx = rs.getString(i + 1);
+                            }else{
                                 fila[i] = rs.getString(i + 1);
                             }
                         }
@@ -709,6 +665,10 @@ public class Reporte_paraTransportista extends javax.swing.JFrame {
                             fila[10] = fila[10] + "\n" + vector_celular_cliente_regreso[posicion];
                         } else {
                             fila[10] = vector_celular_cliente_regreso[posicion];
+                        }
+                        
+                        if(cxx.equals("SI_aloj")){
+                            fila[7] = "CXX";
                         }
 
                         model_regreso.addRow(fila);
