@@ -6,6 +6,7 @@
 package interfaces;
 
 import clases.Conexion;
+import clases.Util;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.sql.Connection;
